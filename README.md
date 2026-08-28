@@ -1,5 +1,7 @@
 # Documentation & Basic Git Tutorial
 
+## Git Tutorial
+
 Github is a website that allows you to host your repositories online (remote) making it easier to
 collaborate and share your source code, or even the executable.
 
@@ -20,8 +22,8 @@ Origin is the remote hosting site that the repository comes from, or pushes to.
 
 Finally, push it back to the github repository (remote) so that we can see the changes
 you made with the command:  
-`git push <remote> <branch>`
+`git push <remote> <branch>`  
 Which is generally:  
 `git push origin main`
 
----
+## Documentation
