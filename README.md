@@ -18,7 +18,7 @@ you want to record when the file changes (staging), run the command:
 `git add <file_name>`
 
 If you want to check what has been changed, or what is in the staging area, run the command:  
-`git status`
+`git status`  
 ^ This is highly recommended to use both before and after you add your files, so that you can see that you are changing the correct things.
 
 Commit the changes (record them) with the command:  
@@ -33,3 +33,22 @@ Which is generally:
 `git push origin main`
 
 ## Documentation
+>
+>**No magic numbers**
+>> - Use variables (note the section below) rather than direct numbers
+>> - Iterators should be i, j, k, or l 
+>
+>**Verbose variable names**
+>> - Instead of single letter variables, give it a brief, descriptive name.
+>
+>**Comment functions above**
+>> - As necessary, comment a description of the function above it.  
+>>`/*`  
+>>`For example, this is the main function`  
+>>`*/`  
+>>`int main(int argc, char** argv) {`  
+>>`    return 0;`  
+>>`}`  
+>
+>**Git commits should have messages mentioning what they include**
+>> - `git commit -m "<fix, add, remove, etc...>"`
