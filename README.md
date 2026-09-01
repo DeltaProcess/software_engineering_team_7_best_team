@@ -5,7 +5,7 @@
 Github is a website that allows you to host your repositories online (remote) making it easier to
 collaborate and share your source code, or even the executable.
 
-First, clone the repository with the command:
+First, clone the repository with the command:  
 `git clone git@github.com:DeltaProcess/software_engineering_team_7_best_team.git`
 
 It may ask you for an authentication key, you will want to authenticate your account over SSH using [this tutorial.](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#authenticating-with-the-command-line)
