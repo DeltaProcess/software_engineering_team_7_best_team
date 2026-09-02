@@ -43,9 +43,7 @@ Which is generally:
 >
 >**Comment functions above**
 >> - As necessary, comment a description of the function above it.  
->>`/*`  
->>`For example, this is the main function`  
->>`*/`  
+>>`// For example, this is the main function`  
 >>`int main(int argc, char** argv) {`  
 >>`    return 0;`  
 >>`}`  
