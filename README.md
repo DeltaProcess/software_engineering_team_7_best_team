@@ -1,6 +1,6 @@
 # Documentation & Basic Git Tutorial
 
-## Git Tutorial :)
+## Git Tutorial :) :)
 
 Github is a website that allows you to host your repositories online (remote) making it easier to
 collaborate and share your source code, or even the executable.
