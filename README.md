@@ -1,4 +1,12 @@
-# Documentation & Basic Git Tutorial
+# Documentation, Team, & Basic Git Tutorial
+
+## Team 7 Members
+
+- **bdurbin313**: Benjamin Durbin
+- **graduatedgrate24324**: Colin
+- **wearymango**: Miraya
+- **willrwhitlow**: Will
+- **DeltaProcess**: Dylan
 
 ## Git Tutorial :) :)
 
@@ -35,19 +43,25 @@ Which is generally:
 ## Documentation
 >
 >**No magic numbers**
->> - Use variables (note the section below) rather than direct numbers
->> - Iterators should be i, j, k, or l 
+> - Use variables (note the section below) rather than direct numbers
+> - Iterators should be i, j, k, or l 
 >
->**Verbose variable names**
->> - Instead of single letter variables, give it a brief, descriptive name.
+>**Verbose variable & function names**
+> - Instead of single letter variables, give it a brief, descriptive name.
 >
->**Comment functions above**
->> - As necessary, comment a description of the function above it.  
->>`// For example, this is the main function.`  
->>`// And this is the second line of the comment.`  
->>`int main(int argc, char** argv) {`  
->>`    return 0;`  
->>`}`  
+>**Comment what a function does above it**
+> - As necessary, comment a description of the function above it.  
+>```
+> // For example, this is the main function.
+> // And this is the second line of the comment.
+> // Add a space between the comment and the operator
+> int main(int argc, char** argv) {
+>     return 0;
+> }
+>```
 >
->**Git commits should have messages mentioning what they include**
->> - `git commit -m "<fix, add, remove, etc...>"`
+>**Verbose git comments**
+> - Mention what the commit actually includes.
+>
+> `git commit -m "<fix, add, remove, etc...>"`
+>
