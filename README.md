@@ -19,7 +19,7 @@ First, clone the repository with the command:
 It may ask you for an authentication key, you will want to authenticate your account over SSH using [this tutorial.](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#authenticating-with-the-command-line)
 
 You can pull this repository with the command:  
-`git pull`
+`git pull origin main`
 
 Make changes to the code, such as correcting or adding to this documentation. To let git know that
 you want to record when the file changes (staging), run the command:  
