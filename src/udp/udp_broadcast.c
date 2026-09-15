@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 
 #define PORT 7500 // Port number to send the broadcast
-#define NETWORK_ADDRESS "192.168.1.255" // Replace with your specific network address
+#define NETWORK_ADDRESS "127.0.0.1" // Replaced with the Project overview specified network address
 
 int main() {
     int sockfd;
