@@ -21,6 +21,7 @@
 - run the command `cmake -S . -B ./build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++` to compile cmake.
 - run the command `cmake --build ./build` to build the exe.
 
-(WIP) if you already have the repo cloned (steps 1 and 2 are for the first time you do everything), replace steps 1 and 2 with:
-- `git pull`
-then continue from step 3
+(WIP) if you already have the repo cloned (steps 1 and 2 are for the first time you do everything), replace steps 1 through 3 with:
+- `cd software_engineering_team_7_best_team`
+- `git pull`  
+then proceed from the how to run the exe command portion with the super long cmake command :)
