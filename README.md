@@ -11,3 +11,11 @@
 ## Description
 
 ## Installation
+
+(WIP) here is how to install cmake and c++ compiler and all that stuff on vm
+1. `sudo apt install cmake`
+
+
+(WIP) here is how to run the exe
+- run the command `cmake -S . -B ./build` to compile cmake.
+- run the command `cmake --build ./build` to build the exe.
