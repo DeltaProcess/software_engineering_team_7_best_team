@@ -1,5 +1,5 @@
 #minimum required version of cmake (i guessed)
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.10)
 
 #project name!
 project("Photon 7")
