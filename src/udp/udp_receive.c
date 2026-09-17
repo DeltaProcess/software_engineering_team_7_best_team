@@ -6,7 +6,7 @@
 
 #define PORT 7501 // Replaced with the Project overview specified receiver port
 
-int main() {
+int receive() {
     int sockfd;
     struct sockaddr_in my_addr;
     struct sockaddr_in client_addr;

@@ -7,7 +7,7 @@
 #define PORT 7500 // Port number to send the broadcast
 #define NETWORK_ADDRESS "127.0.0.1" // Replaced with the Project overview specified network address
 
-int main() {
+int broadcast() {
     int sockfd;
     struct sockaddr_in broadcast_addr;
     char broadcast_message[] = "Hello, UDP Broadcast!";
