@@ -8,7 +8,11 @@ project("Photon 7")
 set(CMAKE_CXX_STANDARD 14)
 
 #set SOURCE_FILES to the list of files we are compiling
-file(GLOB SOURCE_FILES "src/udp/*.c")
+file(GLOB SOURCE_FILES "./src/*.cpp" "./src/*.h" "./src/udp/*.c")
 
 #create exe
 add_executable(main ${SOURCE_FILES})
+
+#include cpptk files
+target_include_directories(main PRIVATE "./lib/cpptk-1.0.2/")
+target_include_directories(main PRIVATE "./lib/cpptk-1.0.2/base/")
