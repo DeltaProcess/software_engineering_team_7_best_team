@@ -10,18 +10,20 @@
 
 ## Description
 
-## Installation
+## First Time Installation
 
-(WIP) here is how to install cmake and c++ compiler and all that stuff on vm
+Run the following commands in order to install the software and all necessary dependencies:
+
 1. `sudo apt install cmake`
 2. `git clone https://github.com/DeltaProcess/software_engineering_team_7_best_team`
 3. `cd software_engineering_team_7_best_team`
 
-(WIP) here is how to run the exe
-- run the command `cmake -S . -B ./build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++` to compile cmake.
-- run the command `cmake --build ./build` to build the exe.
+## Running The Software
 
-(WIP) if you already have the repo cloned (steps 1 and 2 are for the first time you do everything), replace steps 1 through 3 with:
-- `cd software_engineering_team_7_best_team`
-- `git pull`  
-then proceed from the how to run the exe command portion with the super long cmake command :)
+If you have just installed the software, skip directly to step 3.
+
+1. `cd software_engineering_team_7_best_team`
+2. `git pull`  
+3. `cmake -S . -B ./build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++`
+4. `cmake --build ./build`
+5. [[WIP, THE SCRIPT DOES NOT BUILD YET SO I DO NOT KNOW THE CORRECT COMMAND TO RUN IT, WILL FIX LATER - Ben]]
