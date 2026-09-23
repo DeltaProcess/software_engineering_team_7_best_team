@@ -3,9 +3,8 @@
 
 class Interface {
 	public:
-		Interface();
-		void hello();
-		void init();
+		Interface(char* arg);
+		static void hello();
 };
 
 #endif

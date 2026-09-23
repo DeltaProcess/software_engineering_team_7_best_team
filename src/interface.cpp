@@ -1,19 +1,19 @@
 #include "cpptk.h"
+#include "interface.h"
+
+#include <iostream>
+
+using namespace Tk;
 
 Interface::Interface(char* arg) {
-	this->init(arg)
+	init(arg);
+
+	button(".b") -text("Say Hello") -command(this->hello);
+	pack(".b") -padx(20) -pady(6);
+			  
+	runEventLoop();
 }
 
 void Interface::hello() {
-	Tk::puts("Hello C++/Tk!");
-}
-
-void Interface::init(char* arg)
-{
-	Tk::init(arg);
-
-	Tk::button(".b") -text("Say Hello") -command(hello);
-	Tk::pack(".b") -padx(20) -pady(6);
-			  
-	Tk::runEventLoop();
+	std::cout << "Hello, world!" << std::endl;
 }
