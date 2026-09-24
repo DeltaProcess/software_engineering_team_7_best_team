@@ -8,8 +8,8 @@
 //
 
 #include "cpptkbase.h"
-#include <tcl.h>
-#include <tk.h>
+#include <tcl/tcl.h>
+#include <tk/tk.h>
 #include <map>
 #include <ostream>
 #include <iostream>
@@ -18,8 +18,6 @@
 
 using namespace Tk;
 using namespace Tk::details;
-using namespace boost;
-using namespace std;
 
 namespace { // anonymous
 
@@ -33,19 +31,19 @@ public:
           int cc = Tcl_Init(interp_);
           if (cc != TCL_OK)
           {
-               throw TkError(interp_->result);
+			   Tcl_SetResult(interp_, "error", TCL_STATIC);
           }
 
           cc = Tk_Init(interp_);
           if (cc != TCL_OK)
           {
-               throw TkError(interp_->result);
+               Tcl_SetResult(interp_, "error", TCL_STATIC);
           }
           
           cc = Tcl_Eval(interp_, "namespace eval CppTk {}");
           if (cc != TCL_OK)
           {
-               throw TkError(interp_->result);
+               Tcl_SetResult(interp_, "error", TCL_STATIC);
           }
      }
      
@@ -71,9 +69,9 @@ Tcl_Interp * getInterp()
 
 // output stream for dumping Tk commands
 // (useful for automated testing)
-ostream *dumpstream = &cerr;
+std::ostream *dumpstream = &std::cerr;
 
-void do_eval(string const &str)
+void do_eval(std::string const &str)
 {
 #ifdef CPPTK_DUMP_COMMANDS
      *dumpstream << str << '\n';
@@ -83,13 +81,13 @@ void do_eval(string const &str)
      int cc = Tcl_Eval(getInterp(), str.c_str());
      if (cc != TCL_OK)
      {
-          throw TkError(getInterp()->result);
+          throw TkError(Tcl_GetStringResult(getInterp()));
      }
 #endif
 }
 
 // map for callbacks
-typedef map<int, shared_ptr<CallbackBase> > CallbacksMap;
+typedef std::map<int, boost::shared_ptr<CallbackBase> > CallbacksMap;
 CallbacksMap callbacks;
 
 // callback id
@@ -97,15 +95,15 @@ int callbackId = 0;
 
 char const *callbackPrefix = "CppTk::callback";
 
-typedef map<int *,    string> IntLinks;
-typedef map<double *, string> DoubleLinks;
-typedef map<string *, string> StringLinks;
+typedef std::map<int *,    std::string> IntLinks;
+typedef std::map<double *, std::string> DoubleLinks;
+typedef std::map<std::string *, std::string> StringLinks;
 
 IntLinks intLinks;
 DoubleLinks doubleLinks;
 StringLinks stringLinks;
 
-typedef map<string *, char *> StringLinkBuffers;
+typedef std::map<std::string *, char *> StringLinkBuffers;
 StringLinkBuffers stringLinkBuffers;
 
 int linkId = 0;
@@ -122,7 +120,7 @@ void linkCpptoTcl()
      for (StringLinks::iterator it = stringLinks.begin();
           it != stringLinks.end(); ++it)
      {
-          string *ps = it->first; // pointer to C++ string (original value)
+          std::string *ps = it->first; // pointer to C++ string (original value)
 
           StringLinkBuffers::iterator itb = stringLinkBuffers.find(ps);
           char *&pb = itb->second; // pointer to Tcl buffer (destination)
@@ -158,7 +156,7 @@ void linkTcltoCpp()
      for (StringLinks::iterator it = stringLinks.begin();
           it != stringLinks.end(); ++it)
      {
-          string *ps = it->first; // pointer to C++ string (destination)
+          std::string *ps = it->first; // pointer to C++ string (destination)
           
           StringLinkBuffers::iterator itb = stringLinkBuffers.find(ps);
           char *pb = itb->second; // pointer to Tcl buffer (original value)
@@ -209,7 +207,7 @@ int callbackHandler(ClientData cd, Tcl_Interp *interp,
           // refresh Tcl variables
           linkCpptoTcl();
      }
-     catch (exception const &e)
+     catch (std::exception const &e)
      {
           Tcl_SetResult(interp, const_cast<char*>(e.what()), TCL_VOLATILE);
           return TCL_ERROR;
@@ -226,13 +224,13 @@ void callbackDeleter(ClientData cd)
      callbacks.erase(slot);
 }
 
-string Tk::details::addCallback(shared_ptr<CallbackBase> cb)
+std::string Tk::details::addCallback(boost::shared_ptr<CallbackBase> cb)
 {
      int newSlot = callbackId++;
      callbacks[newSlot] = cb;
      
-     string newCmd(callbackPrefix);
-     newCmd += lexical_cast<string>(newSlot);
+     std::string newCmd(callbackPrefix);
+     newCmd += boost::lexical_cast<std::string>(newSlot);
      
      Tcl_CreateObjCommand(getInterp(), newCmd.c_str(),
           callbackHandler, reinterpret_cast<ClientData>(
@@ -242,47 +240,47 @@ string Tk::details::addCallback(shared_ptr<CallbackBase> cb)
      return newCmd;
 }
 
-string Tk::details::addLinkVar(int &i)
+std::string Tk::details::addLinkVar(int &i)
 {
      int newLink = linkId++;
-     string newLinkVar(linkVarPrefix);
-     newLinkVar += lexical_cast<string>(newLink);
+     std::string newLinkVar(linkVarPrefix);
+     newLinkVar += boost::lexical_cast<std::string>(newLink);
      
      int cc = Tcl_LinkVar(getInterp(), newLinkVar.c_str(),
           reinterpret_cast<char*>(&i), TCL_LINK_INT);
      if (cc != TCL_OK)
      {
-          throw TkError(getInterp()->result);
+          throw TkError(Tcl_GetStringResult(getInterp()));
      }
      
      intLinks[&i] = newLinkVar;
      return newLinkVar;
 }
 
-string Tk::details::addLinkVar(double &d)
+std::string Tk::details::addLinkVar(double &d)
 {
      int newLink = linkId++;
-     string newLinkVar(linkVarPrefix);
-     newLinkVar += lexical_cast<string>(newLink);
+     std::string newLinkVar(linkVarPrefix);
+     newLinkVar += boost::lexical_cast<std::string>(newLink);
      
      int cc = Tcl_LinkVar(getInterp(), newLinkVar.c_str(),
           reinterpret_cast<char*>(&d), TCL_LINK_DOUBLE);
      if (cc != TCL_OK)
      {
-          throw TkError(getInterp()->result);
+          throw TkError(Tcl_GetStringResult(getInterp()));
      }
      
      doubleLinks[&d] = newLinkVar;
      return newLinkVar;
 }
 
-string Tk::details::addLinkVar(string &s)
+std::string Tk::details::addLinkVar(std::string &s)
 {
      int newLink = linkId++;
-     string newLinkVar(linkVarPrefix);
-     newLinkVar += lexical_cast<string>(newLink);
+     std::string newLinkVar(linkVarPrefix);
+     newLinkVar += boost::lexical_cast<std::string>(newLink);
      
-     pair<map<string *, char *>::iterator, bool> it =
+     std::pair<std::map<std::string *, char *>::iterator, bool> it =
           stringLinkBuffers.insert(make_pair(&s, static_cast<char*>(NULL)));
      
      char *&pb = it.first->second;
@@ -294,7 +292,7 @@ string Tk::details::addLinkVar(string &s)
           reinterpret_cast<char*>(&it.first->second), TCL_LINK_STRING);
      if (cc != TCL_OK)
      {
-          throw TkError(getInterp()->result);
+          throw TkError(Tcl_GetStringResult(getInterp()));
      }
      
      stringLinks[&s] = newLinkVar;
@@ -325,7 +323,7 @@ void Tk::details::deleteLinkVar(double &d)
      doubleLinks.erase(it);
 }
 
-void Tk::details::deleteLinkVar(string &s)
+void Tk::details::deleteLinkVar(std::string &s)
 {
      StringLinks::iterator it = stringLinks.find(&s);
      if (it == stringLinks.end())
@@ -361,7 +359,7 @@ void details::setResult(double d)
      Tcl_SetObjResult(getInterp(), Tcl_NewDoubleObj(d));
 }
 
-void details::setResult(string const &s)
+void details::setResult(std::string const &s)
 {
      Tcl_SetObjResult(getInterp(),
           Tcl_NewStringObj(s.data(), static_cast<int>(s.size())));
@@ -377,7 +375,8 @@ int details::getResultLen()
      cc = Tcl_ListObjLength(interp, list, &len);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          Tcl_SetResult(interp, "error", TCL_STATIC);
+		  return TCL_ERROR;
      }
      
      return len;
@@ -394,14 +393,16 @@ int details::getResultElem<int>(int indx)
      int cc = Tcl_ListObjIndex(interp, list, indx, &obj);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          Tcl_SetResult(interp, "error", TCL_STATIC);
+		  return TCL_ERROR;
      }
      
      int val;
      cc = Tcl_GetIntFromObj(interp, obj, &val);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          Tcl_SetResult(interp, "error", TCL_STATIC);
+		  return TCL_ERROR;
      }
      
      return val;
@@ -418,21 +419,23 @@ double details::getResultElem<double>(int indx)
      int cc = Tcl_ListObjIndex(interp, list, indx, &obj);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          Tcl_SetResult(interp, "error", TCL_STATIC);
+		  return TCL_ERROR;
      }
      
      double val;
      cc = Tcl_GetDoubleFromObj(interp, obj, &val);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          Tcl_SetResult(interp, "error", TCL_STATIC);
+		  return TCL_ERROR;
      }
      
      return val;
 }
 
 template <>
-string details::getResultElem<string>(int indx)
+std::string details::getResultElem<std::string>(int indx)
 {
      Tcl_Interp *interp = getInterp();
 
@@ -442,7 +445,7 @@ string details::getResultElem<string>(int indx)
      int cc = Tcl_ListObjIndex(interp, list, indx, &obj);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          throw TkError(Tcl_GetStringResult(interp));
      }
      
      return Tcl_GetString(obj);
@@ -461,10 +464,10 @@ details::Command::~Command()
      }
 }
 
-string details::Command::invoke() const
+std::string details::Command::invoke() const
 {
      invokeOnce();
-     return getInterp()->result;
+     return Tcl_GetStringResult(getInterp());
 }
 
 void details::Command::invokeOnce() const
@@ -473,14 +476,14 @@ void details::Command::invokeOnce() const
      {
           invoked_ = true;
           
-          string cmd(str_);
+          std::string cmd(str_);
           cmd += postfix_;
           
           do_eval(cmd);
      }
 }
 
-details::Expr::Expr(string const &str, bool starter)
+details::Expr::Expr(std::string const &str, bool starter)
 {
      if (starter)
      {
@@ -492,12 +495,12 @@ details::Expr::Expr(string const &str, bool starter)
      }
 }
 
-details::Expr::Expr(string const &str, string const &postfix)
+details::Expr::Expr(std::string const &str, std::string const &postfix)
 {
      cmd_.reset(new Command(str, postfix));
 }
 
-string details::Expr::getValue() const
+std::string details::Expr::getValue() const
 {
      if (!str_.empty())
      {
@@ -509,7 +512,7 @@ string details::Expr::getValue() const
      }
 }
 
-details::Expr::operator string() const
+details::Expr::operator std::string() const
 {
      return cmd_->invoke();
 }
@@ -525,7 +528,8 @@ details::Expr::operator int() const
      cc = Tcl_GetIntFromObj(interp, obj, &val);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          Tcl_SetResult(interp, "error", TCL_STATIC);
+		  return TCL_ERROR;
      }
      
      return val;
@@ -542,7 +546,8 @@ details::Expr::operator double() const
      int cc = Tcl_GetDoubleFromObj(interp, obj, &val);
      if (cc != TCL_OK)
      {
-          throw TkError(interp->result);
+          Tcl_SetResult(interp, "error", TCL_STATIC);
+		  return TCL_ERROR;
      }
      
      return val;
@@ -550,7 +555,7 @@ details::Expr::operator double() const
 
 details::Expr::operator Tk::Point() const
 {
-     string ret(cmd_->invoke());
+     std::string ret(cmd_->invoke());
      if (ret.empty())
      {
           return Tk::Point(0, 0);
@@ -570,7 +575,7 @@ details::Expr::operator Tk::Point() const
 
 details::Expr::operator Tk::Box() const
 {
-     string ret(cmd_->invoke());
+     std::string ret(cmd_->invoke());
      if (ret.empty())
      {
           return Tk::Box(0, 0, 0, 0);
@@ -607,14 +612,14 @@ int details::Params::get<int>(int argno) const
      cc = Tcl_GetIntFromObj(getInterp(), objv[argno], &res);
      if (cc != TCL_OK)
      {
-          throw TkError(getInterp()->result);
+          throw TkError(Tcl_GetStringResult(getInterp()));
      }
      
      return res;
 }
 
 template <>
-string details::Params::get<string>(int argno) const
+std::string details::Params::get<std::string>(int argno) const
 {
      if (argno < 1 || argno >= argc_)
      {
@@ -623,21 +628,21 @@ string details::Params::get<string>(int argno) const
      
      Tcl_Obj *CONST *objv = reinterpret_cast<Tcl_Obj *CONST *>(objv_);
      
-     string res = Tcl_GetString(objv[argno]);
+     std::string res = Tcl_GetString(objv[argno]);
      return res;
 }
 
-ostream & details::operator<<(ostream &os, BasicToken const &token)
+std::ostream & details::operator<<(std::ostream &os, BasicToken const &token)
 {
-     return os << static_cast<string>(token);
+     return os << static_cast<std::string>(token);
 }
 
 namespace { // anonymous
 
-void doSingleQuote(string &s, char c)
+void doSingleQuote(std::string &s, char c)
 {
-     string::size_type pos = 0;
-     while ((pos = s.find(c, pos)) != string::npos)
+     std::string::size_type pos = 0;
+     while ((pos = s.find(c, pos)) != std::string::npos)
      {
           s.insert(pos, "\\");
           pos += 2;
@@ -648,9 +653,9 @@ void doSingleQuote(string &s, char c)
 
 // this function is used to quote quotation marks in string values'
 // in later version, it will not be needed
-string details::quote(string const &s)
+std::string details::quote(std::string const &s)
 {
-     string ret(s);
+     std::string ret(s);
      doSingleQuote(ret, '\\');
      doSingleQuote(ret, '\"');
      doSingleQuote(ret, '$');
@@ -664,15 +669,15 @@ string details::quote(string const &s)
 
 Expr Tk::operator-(Expr const &lhs, Expr const &rhs)
 {
-     shared_ptr<Command> cmd(lhs.getCmd());
+     boost::shared_ptr<Command> cmd(lhs.getCmd());
      cmd->append(rhs.getValue());
      
      return Expr(cmd);
 }
 
-Expr Tk::operator<<(string const &w, Expr const &rhs)
+Expr Tk::operator<<(std::string const &w, Expr const &rhs)
 {
-     shared_ptr<Command> cmd(rhs.getCmd());
+     boost::shared_ptr<Command> cmd(rhs.getCmd());
      cmd->prepend(" ");
      cmd->prepend(w);
 
@@ -681,26 +686,26 @@ Expr Tk::operator<<(string const &w, Expr const &rhs)
 
 // helper functions
 
-void Tk::deleteCallback(string const &name)
+void Tk::deleteCallback(std::string const &name)
 {
-     string::size_type pos = name.find_first_not_of(callbackPrefix);
-     if (pos == string::npos) return;
+     std::string::size_type pos = name.find_first_not_of(callbackPrefix);
+     if (pos == std::string::npos) return;
      
-     int slot = lexical_cast<int>(name.substr(pos, name.size()));
+     int slot = boost::lexical_cast<int>(name.substr(pos, name.size()));
      callbacks.erase(slot);
      
      int cc = Tcl_DeleteCommand(getInterp(), name.c_str());
      if (cc != TCL_OK)
      {
-          throw TkError(getInterp()->result);
+          throw TkError(Tcl_GetStringResult(getInterp()));
      }
 }
 
-Tk::CallbackHandle::CallbackHandle(string const &name) : name_(name) {}
+Tk::CallbackHandle::CallbackHandle(std::string const &name) : name_(name) {}
 
 Tk::CallbackHandle::~CallbackHandle() { deleteCallback(name_); }
 
-Expr Tk::eval(string const &str)
+Expr Tk::eval(std::string const &str)
 {
      return Expr(str);
 }
@@ -718,7 +723,7 @@ void Tk::runEventLoop()
      Tk_MainLoop();
 }
 
-void Tk::setDumpStream(ostream &os)
+void Tk::setDumpStream(std::ostream &os)
 {
 	dumpstream = &os;
 }

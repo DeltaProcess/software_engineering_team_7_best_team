@@ -1,19 +1,23 @@
-#minimum required version of cmake (i guessed)
-cmake_minimum_required(VERSION 3.10)
+#minimum required version of cmake
+cmake_minimum_required(VERSION 3.15)
 
 #project name!
 project("Photon 7")
 
-#set standard compiler version of c++ (i guessed again)
+#set standard compiler version of c++
 set(CMAKE_CXX_STANDARD 14)
 
-#set SOURCE_FILES and HEADER_FILES
-file(GLOB SOURCE_FILES "./src/*.cpp" "./src/udp/*.c" "./lib/cpptk-1.0.2/*.cc" "./lib/cpptk-1.0.2/base/*.cc")
-file(GLOB HEADER_FILES "./src/*.h")
+#set source (.c, .cc, .cpp) and header files
+file(GLOB CPPTK_SOURCE "lib/cpptk-1.0.2/*.cc" "lib/cpptk-1.0.2/base/*.cc")
+file(GLOB SOURCE_FILES "src/*.cpp" "src/udp/*.c")
+file(GLOB HEADER_FILES "src/*.h")
 
-#create exe
-add_executable(main ${SOURCE_FILES} ${HEADER_FILES})
+#create main.exe
+add_executable(main ${SOURCE_FILES} ${HEADER_FILES} ${CPPTK_SOURCE})
 
-#include cpptk files
-target_include_directories(main PRIVATE "./lib/cpptk-1.0.2/")
-target_include_directories(main PRIVATE "./lib/cpptk-1.0.2/base/")
+#link dependency headers
+target_include_directories(main PRIVATE "lib/cpptk-1.0.2/")
+
+#link tcl8.6 and tk8.5 libraries
+target_link_libraries(main PRIVATE tcl8.6)
+target_link_libraries(main PRIVATE tk8.6)

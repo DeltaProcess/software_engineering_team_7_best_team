@@ -838,7 +838,7 @@ Expr Tk::yview(string const option, int number, string const &what)
 // options
 
 #define CPPTK_OPTION(name, quote) Option Tk::name(#name, quote);
-#include "cpptkoptions.x"
+#include "cpptkoptions.h"
 #undef CPPTK_OPTION
 
 // other options, requiring special syntax or compilation
@@ -1071,7 +1071,7 @@ ValidateAttr<string> Tk::valid_W("%W"); // %W - name of entry widget
 // constants
 
 #define CPPTK_CONSTANT(c) char const * Tk::c = #c;
-#include "cpptkconstants.x"
+#include "cpptkconstants.h"
 #undef CPPTK_CONSTANT
 
 // additional constants
@@ -1677,4 +1677,3 @@ string Tk::details::RGBToken::operator()(int r, int g, int b) const
 }
 
 RGBToken Tk::rgb;
-

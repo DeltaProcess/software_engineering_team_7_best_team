@@ -1219,7 +1219,7 @@ details::Expr yview(std::string const option,
 // options
 
 #define CPPTK_OPTION(name, quote) extern details::Option name;
-#include "cpptkoptions.x"
+#include "cpptkoptions.h"
 #undef CPPTK_OPTION
 
 // other options, requiring special syntax or compilation
@@ -1609,7 +1609,7 @@ extern details::ValidateAttr<std::string> valid_W; // %W - name of entry
 // constants
 
 #define CPPTK_CONSTANT(c) extern char const * c;
-#include "cpptkconstants.x"
+#include "cpptkconstants.h"
 #undef CPPTK_CONSTANT
 
 // additional constants
