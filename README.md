@@ -14,14 +14,11 @@
 
 Run the following commands in order to install the software and all necessary dependencies:
 
-1. `sudo apt install cmake`
+1. `sudo apt install cmake` 
 2. `sudo apt install libboost-all-dev`
 3. `git clone https://github.com/DeltaProcess/software_engineering_team_7_best_team`
-4. `cd software_engineering_team_7_best_team`
 
 ## Running The Software
-
-If you have just installed the software, skip directly to step 3.
 
 1. `cd software_engineering_team_7_best_team`
 2. `git pull`
