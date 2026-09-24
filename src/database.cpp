@@ -5,7 +5,7 @@ using namespace std;
 int main() {
 	try {
 		//connects to the database
-		pqxx::connection c("user=student password=student host=/var/run/postgresql port=5432 dbname=photon target_session_attrs=read-write");
+		pqxx::connection c("host=/var/run/postgresql port=5432 dbname=photon target_session_attrs=read-write");
 		cout << "Successfully connected to: " << c.dbname() << endl;	
 		
 		//starts a query
