@@ -21,3 +21,4 @@ target_include_directories(main PRIVATE "lib/cpptk-1.0.2/")
 #link tcl8.6 and tk8.5 libraries
 target_link_libraries(main PRIVATE tcl8.6)
 target_link_libraries(main PRIVATE tk8.6)
+target_link_libraries(main PRIVATE pqxx)
