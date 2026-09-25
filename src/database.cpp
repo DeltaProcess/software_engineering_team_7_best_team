@@ -1,13 +1,16 @@
-#include <iostream>
-#include <pqxx/pqxx>
-#include <string>
+#include "database.h"
+using namespace std;
 
-int init() {
+Database::Database()
+	: c("host=/var/run/postgresql port=5432 dbname=photon target_session_attrs=read-write") //initializes connection c
+{
+	
+	cout << "Successfully connected to: " << c.dbname() << endl;
+}
+
+
+void Database::printTable(){
 	try {
-		//connects to the database
-		pqxx::connection c("host=/var/run/postgresql port=5432 dbname=photon target_session_attrs=read-write");
-		std::cout << "Successfully connected to: " << c.dbname() << std::endl;	
-		
 		//starts a query
 		pqxx::work tx(c);
 		
@@ -16,22 +19,56 @@ int init() {
 
         //prints column names
         for (pqxx::row_size_type col = 0; col < res.columns(); col++) {
-            std::cout << res.column_name(col) << "\t";
+            cout << res.column_name(col) << "\t";
         }
-        std::cout << "\n";
+        cout << "\n";
 
         //prints every row
         for (pqxx::result::size_type r = 0; r < res.size(); r++) {
 			for (pqxx::row_size_type c = 0; c < res.columns(); c++) {
-				std::cout << res[r][c].c_str() << "\t";
+				cout << res[r][c].c_str() << "\t";
 			}
-			std::cout << "\n";
+			cout << "\n";
 		}
-        
-        // tx.commit(); if writing to database, need this line
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		return 1;
+	}catch (const exception &e) {
+		cerr << e.what() << endl;
 	}
-	return 0;
 }
+
+string Database::searchID(int id) { //will return an empty string if not found
+	try {
+		pqxx::work tx(c);
+        pqxx::result code = tx.exec_params("SELECT codename FROM players WHERE id = $1",id);
+        
+        if (code.empty()){
+			return "";
+		}
+		return code[0][0].c_str();
+		
+	}catch (const exception &e) {
+		cerr << e.what() << endl;
+		return "";
+	}
+	
+}
+
+void Database::addPlayer(int id, string codename){ 
+	if (searchID(id) == ""){ //no duplicates
+		try{
+			pqxx::work tx(c);
+			tx.exec_params("INSERT INTO players (id, codename) VALUES ($1, $2)", id, codename);
+			tx.commit();
+			cout << "Successfully added " + codename << endl;
+		} catch (const exception &e) {
+			cerr << e.what() << endl;
+		}
+	}else{
+		cout << "Player ID " + to_string(id) + " already in use." << endl;
+	}
+}
+
+
+
+
+
+
