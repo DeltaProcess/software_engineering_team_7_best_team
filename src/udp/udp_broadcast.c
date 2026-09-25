@@ -7,7 +7,7 @@
 #define PORT 7500 // Port number to send the broadcast
 #define NETWORK_ADDRESS "127.0.0.1" // Replaced with the Project overview specified network address
 
-int broadcast() {
+int broadcast(const char* networkAddress) {
     int sockfd;
     struct sockaddr_in broadcast_addr;
     char broadcast_message[] = "Hello, UDP Broadcast!";
@@ -30,7 +30,7 @@ int broadcast() {
     memset(&broadcast_addr, 0, sizeof(broadcast_addr));
     broadcast_addr.sin_family = AF_INET;
     broadcast_addr.sin_port = htons(PORT);
-    if (inet_pton(AF_INET, NETWORK_ADDRESS, &broadcast_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, networkAddress, &broadcast_addr.sin_addr) <= 0) {
         perror("inet_pton");
         exit(1);
     }
@@ -42,7 +42,7 @@ int broadcast() {
     if (bytes_sent == -1) {
         perror("sendto");
     } else {
-        printf("Sent %ld bytes to %s:%d\n", bytes_sent, NETWORK_ADDRESS, PORT);
+        printf("Sent %ld bytes to %s:%d\n", bytes_sent, networkAddress, PORT);
     }
     
     close(sockfd);
