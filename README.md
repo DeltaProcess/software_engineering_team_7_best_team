@@ -14,9 +14,8 @@
 
 Run the following commands in order to install the software and all necessary dependencies:
 
-1. `sudo apt install cmake` 
-2. `sudo apt install libboost-all-dev`
-3. `git clone https://github.com/DeltaProcess/software_engineering_team_7_best_team`
+1. `sudo apt install cmake tcl8.6-dev tk8.6-dev libboost-all-dev`
+2. `git clone https://github.com/DeltaProcess/software_engineering_team_7_best_team`
 
 ## Running The Software
 
