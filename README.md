@@ -46,4 +46,4 @@ Then, run the following commands to install all dependencies and
 2. `git pull`
 3. `cmake -S . -B ./build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++`
 4. `cmake --build ./build`
-5. [[WIP, THE SCRIPT DOES NOT BUILD YET SO I DO NOT KNOW THE CORRECT COMMAND TO RUN IT, WILL FIX LATER - Ben]]
+5. `./build/main`
