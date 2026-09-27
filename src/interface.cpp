@@ -25,23 +25,39 @@ Interface::Interface(char* arg) {
 	
 	// red and green team labels
 	label(".l1") -width(40) -text("Red Team") -fg("red") -bg("black");
-	label(".l2") -width(40) -text("Green Team") -fg("red") -bg("black");
+	label(".l2") -width(40) -text("Green Team") -fg("green") -bg("black");
 	grid(configure, ".l1") -column(0) -row(0);
 	grid(configure, ".l2") -column(1) -row(0);
 	
 	// red and green team text display
-	textw(".t1") -width(40) -height(40) -fg("red") -bg("black");
-	textw(".t2") -width(40) -height(40) -fg("red") -bg("black");
+	textw(".t1") -width(40) -height(30) -fg("red") -bg("black");
+	textw(".t2") -width(40) -height(30) -fg("green") -bg("black");
 	grid(configure, ".t1") -column(0) -row(1);
 	grid(configure, ".t2") -column(1) -row(1);
 	
 	// red and green team entries
-	entry(".e1") -textvariable(this->str) -width(40);
-	entry(".e2") -textvariable(this->str) -width(40);
+	entry(".e1") -textvariable(this->str) -width(20) -invalidcommand("bell");
+	entry(".e2") -textvariable(this->str) -width(20) -invalidcommand("bell");
+	entry(".e3") -textvariable(this->str) -width(20) -invalidcommand("bell");
+	entry(".e4") -textvariable(this->str) -width(20) -invalidcommand("bell");
 	grid(configure, ".e1") -column(0) -row(2);
-	grid(configure, ".e2") -column(1) -row(2);
+	grid(configure, ".e2") -column(0) -row(3);
+	grid(configure, ".e3") -column(1) -row(2);
+	grid(configure, ".e4") -column(1) -row(3);
+	".e1" << insert(0, "id:");
+	".e2" << insert(0, "codename:");
+	".e3" << insert(0, "id:");
+	".e4" << insert(0, "codename:");
+	
+	// add user
+	button(".b") -text("Enter Player") -command(this->getPlayer);
+	grid(configure, ".b") -column(0) -row(4);
 	
 	runEventLoop();
+}
+
+Interface::~Interface() {
+	
 }
 
 // remove splash screen
@@ -67,4 +83,10 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	std::ofstream ofs(this->tmp_img, std::ofstream::out);
 	ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
 	ofs.close();
+}
+
+// get player information
+std::string* Interface::getPlayer() {
+	std::string* player = new std::string[2];
+	return player;
 }
