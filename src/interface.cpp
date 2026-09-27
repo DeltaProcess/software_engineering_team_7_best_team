@@ -14,12 +14,13 @@ using namespace cv;
 Interface::Interface(char* arg) {
 	init(arg);
 	
-	this->tmp_img = "assets/images/tmp.gif";
+	this->tmp_img = "assets/images/tmp.png";
 	
 	// splash screen
 	importImage("assets/images/logo.jpg", 300, 300);
 	button(".b") -image(images(create, photo, "logo") -file(this->tmp_img));
 	pack(".b") -expand(true) -fill("both");
+	update();
 	splash();
 	
 	// red and green team labels
