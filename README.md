@@ -37,7 +37,7 @@ Run the following commands in order to update the VM so dependencies can install
 
 Then, run the following commands to install all dependencies and 
 
-10. `sudo apt install cmake tcl8.6-dev tk8.6-dev libboost-all-dev libpqxx-dev`
+10. `sudo apt install cmake tcl-dev tk-dev libboost-all-dev libpqxx-dev libopencv-dev`
 11. `git clone https://github.com/DeltaProcess/software_engineering_team_7_best_team`
 
 ## Running The Software

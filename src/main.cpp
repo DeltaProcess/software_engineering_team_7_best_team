@@ -14,7 +14,6 @@ int main(int argc, char** argv)
 
      broadcast(networkAddress.c_str());
 
-     
      Interface* interface = new Interface(argv[0]);
 
      return 0;

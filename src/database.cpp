@@ -1,4 +1,5 @@
 #include "database.h"
+
 using namespace std;
 
 Database::Database()
@@ -9,7 +10,7 @@ Database::Database()
 }
 
 
-void Database::printTable(){
+void Database::printTable() {
 	try {
 		//starts a query
 		pqxx::work tx(c);
@@ -30,7 +31,7 @@ void Database::printTable(){
 			}
 			cout << "\n";
 		}
-	}catch (const exception &e) {
+	} catch (const exception &e) {
 		cerr << e.what() << endl;
 	}
 }
@@ -45,16 +46,15 @@ string Database::searchID(int id) { //will return an empty string if not found
 		}
 		return code[0][0].c_str();
 		
-	}catch (const exception &e) {
+	} catch (const exception &e) {
 		cerr << e.what() << endl;
 		return "";
 	}
-	
 }
 
-void Database::addPlayer(int id, string codename){ 
-	if (searchID(id) == ""){ //no duplicates
-		try{
+void Database::addPlayer(int id, string codename) { 
+	if (searchID(id) == "") { //no duplicates
+		try {
 			pqxx::work tx(c);
 			tx.exec_params("INSERT INTO players (id, codename) VALUES ($1, $2)", id, codename);
 			tx.commit();
@@ -62,7 +62,7 @@ void Database::addPlayer(int id, string codename){
 		} catch (const exception &e) {
 			cerr << e.what() << endl;
 		}
-	}else{
+	} else {
 		cout << "Player ID " + to_string(id) + " already in use." << endl;
 	}
 }

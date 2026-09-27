@@ -4,22 +4,16 @@
 #include <iostream>
 #include <pqxx/pqxx>
 #include <string>
-using namespace std;
-//awesome header file
 
-class Database{
- public:
-   //Constructor
-   Database();
+class Database {
+	public:
+		Database();
+		void printTable();
+		std::string searchID(int id);
+		void addPlayer(int id, std::string codename);
 
-   //Methods
-   void printTable();
-   string searchID(int id);
-   void addPlayer(int id, string codename);
-  
-  private:
-	pqxx::connection c;
-
+	private:
+		pqxx::connection c;
 };
 
 #endif
