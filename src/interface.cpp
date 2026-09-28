@@ -52,17 +52,10 @@ Interface::Interface(char* arg) {
 	
 	
 	// red and green team entries
-<<<<<<< HEAD
 	entry(".e1") -textvariable(this->redTeamID) -width(20) -invalidcommand("bell");
 	entry(".e2") -textvariable(this->redTeamName) -width(20) -invalidcommand("bell");
 	entry(".e3") -textvariable(this->greenTeamID) -width(20) -invalidcommand("bell");
 	entry(".e4") -textvariable(this->greenTeamName) -width(20) -invalidcommand("bell");
-=======
-	entry(".e1") -textvariable(this->str) -width(20) -invalidcommand("bell");
-	entry(".e2") -textvariable(this->str) -width(20) -invalidcommand("bell");
-	entry(".e3") -textvariable(this->str) -width(20) -invalidcommand("bell");
-	entry(".e4") -textvariable(this->str) -width(20) -invalidcommand("bell");
->>>>>>> c61ac978f4f7577dbb3df5d6754806a031c378a8
 	grid(configure, ".e1") -column(0) -row(2);
 	grid(configure, ".e2") -column(0) -row(3);
 	grid(configure, ".e3") -column(1) -row(2);
@@ -73,16 +66,11 @@ Interface::Interface(char* arg) {
 	".e4" << insert(0, "codename:");
 	
 	// add user
-<<<<<<< HEAD
 	button(".b1") -text("Enter Player") -command(this->getPlayerRed);
 	grid(configure, ".b1") -column(0) -row(4);
 	
 	button(".b2") -text("Enter Player") -command(this->getPlayerGreen);
 	grid(configure, ".b2") -column(1) -row(4);
-=======
-	button(".b") -text("Enter Player") -command(this->getPlayer);
-	grid(configure, ".b") -column(0) -row(4);
->>>>>>> c61ac978f4f7577dbb3df5d6754806a031c378a8
 	
 	runEventLoop();
 }
@@ -116,7 +104,6 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	ofs.close();
 }
 
-<<<<<<< HEAD
 //red team button
 void Interface::getPlayerRed() {
 	int id = std::stoi(redTeamID);
@@ -153,10 +140,4 @@ void Interface::getPlayerGreen() {
 	}
 
 	".t1" << configure() -state("disabled");	
-=======
-// get player information
-std::string* Interface::getPlayer() {
-	std::string* player = new std::string[2];
-	return player;
->>>>>>> c61ac978f4f7577dbb3df5d6754806a031c378a8
 }
