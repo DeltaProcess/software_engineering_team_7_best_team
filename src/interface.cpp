@@ -1,5 +1,6 @@
-#include "cpptk.h"
 #include "interface.h"
+#include "database.h"
+#include "cpptk.h"
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -11,15 +12,11 @@
 using namespace Tk;
 using namespace cv;
 
-
-//static variables and objects because tk stuff
 std::string Interface::redTeamID;
 std::string Interface::redTeamName;
 std::string Interface::greenTeamID;
 std::string Interface::greenTeamName;
 Database Interface::database;
-
-
 
 Interface::Interface(char* arg) {
 	init(arg);
@@ -46,10 +43,6 @@ Interface::Interface(char* arg) {
 	grid(configure, ".t2") -column(1) -row(1);
 	".t1" << configure() -state("disabled");
 	".t2" << configure() -state("disabled");
-
-	
-	
-	
 	
 	// red and green team entries
 	entry(".e1") -textvariable(this->redTeamID) -width(20) -invalidcommand("bell");
@@ -104,36 +97,40 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	ofs.close();
 }
 
-//red team button
+// enter red player
 void Interface::getPlayerRed() {
 	int id = std::stoi(redTeamID);
-	if (id % 2 != 1){ //only odd ids(?)
+	if ((id&1) == 0) {
 		return;
 	}
-	if (database.searchID(id) != ""){ //if the database already has a match
+	// check database match
+	if (database.searchID(id) != "") {
 		".t1" << configure() -state("normal");
 		".t1" << insert("0.0", redTeamID + "\t\t" + database.searchID(id) + "\n");
 	}
-	else if(redTeamName != ""){ //if not, and the codename box isn't empty
+	// check codename filled out
+	else if(redTeamName != "") {
 		database.addPlayer(id, redTeamName);
 		".t1" << configure() -state("normal");
 		".t1" << insert("0.0", redTeamID + "\t\t" + database.searchID(id) + "\n");
 	}
-
+	
 	".t1" << configure() -state("disabled");	
 }
 
-//green team button, same as red but green
+// enter green player
 void Interface::getPlayerGreen() {
 	int id = std::stoi(greenTeamID);
-	if (id % 2 != 0){
+	if (id&1) {
 		return;
 	}
-	if (database.searchID(id) != ""){
+	// check database match
+	if (database.searchID(id) != ""){ 
 		".t2" << configure() -state("normal");
 		".t2" << insert("0.0", greenTeamID + "\t\t" + database.searchID(id) + "\n");
 	}
-	else if(greenTeamName != ""){
+	// check codename filled out
+	else if(greenTeamName != "") {
 		database.addPlayer(id, greenTeamName);
 		".t1" << configure() -state("normal");
 		".t2" << insert("0.0", greenTeamID + "\t\t" + greenTeamName + "\n");

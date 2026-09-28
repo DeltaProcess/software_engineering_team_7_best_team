@@ -9,22 +9,21 @@ Database::Database()
 	cout << "Successfully connected to: " << c.dbname() << endl;
 }
 
-
 void Database::printTable() {
 	try {
-		//starts a query
+		// starts a query
 		pqxx::work tx(c);
 		
-		//gets all columns
+		// gets all columns
         pqxx::result res = tx.exec("SELECT * FROM players");
 
-        //prints column names
+        // prints column names
         for (pqxx::row_size_type col = 0; col < res.columns(); col++) {
             cout << res.column_name(col) << "\t";
         }
         cout << "\n";
 
-        //prints every row
+        // prints every row
         for (pqxx::result::size_type r = 0; r < res.size(); r++) {
 			for (pqxx::row_size_type c = 0; c < res.columns(); c++) {
 				cout << res[r][c].c_str() << "\t";
@@ -36,24 +35,25 @@ void Database::printTable() {
 	}
 }
 
-string Database::searchID(int id) { //will return an empty string if not found
+// returns "" if invalid
+string Database::searchID(int id) {
 	try {
 		pqxx::work tx(c);
         pqxx::result code = tx.exec_params("SELECT codename FROM players WHERE id = $1",id);
         
-        if (code.empty()){
+        if (code.empty()) {
 			return "";
 		}
 		return code[0][0].c_str();
-		
 	} catch (const exception &e) {
 		cerr << e.what() << endl;
 		return "";
 	}
 }
 
-void Database::addPlayer(int id, string codename) { 
-	if (searchID(id) == "") { //no duplicates
+void Database::addPlayer(int id, string codename) {
+	// check duplicates
+	if (searchID(id) == "") {
 		try {
 			pqxx::work tx(c);
 			tx.exec_params("INSERT INTO players (id, codename) VALUES ($1, $2)", id, codename);
@@ -68,13 +68,13 @@ void Database::addPlayer(int id, string codename) {
 }
 
 void Database::editCodename(int id, string codename){
-	if (searchID(id) != ""){
-		try{
+	if (searchID(id) != "") {
+		try {
 			pqxx::work tx(c);
 			tx.exec_params("UPDATE players SET codename = $1 WHERE id = $2", codename, id);
 			tx.commit();
 			cout << "Successfully edited ID: " + to_string(id) + ", new Codename = " + codename << endl;
-		}catch (const exception &e){
+		} catch (const exception &e) {
 			cerr << e.what() << endl;
 		}
 	}
