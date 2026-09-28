@@ -11,6 +11,7 @@ class Database {
 		void printTable();
 		std::string searchID(int id);
 		void addPlayer(int id, std::string codename);
+		void editCodename(int id, std::string codename);
 
 	private:
 		pqxx::connection c;

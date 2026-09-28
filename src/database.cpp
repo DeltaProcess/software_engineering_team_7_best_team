@@ -67,6 +67,20 @@ void Database::addPlayer(int id, string codename) {
 	}
 }
 
+void Database::editCodename(int id, string codename){
+	if (searchID(id) != ""){
+		try{
+			pqxx::work tx(c);
+			tx.exec_params("UPDATE players SET codename = $1 WHERE id = $2", codename, id);
+			tx.commit();
+			cout << "Successfully edited ID: " + to_string(id) + ", new Codename = " + codename << endl;
+		}catch (const exception &e){
+			cerr << e.what() << endl;
+		}
+	}
+}
+
+
 
 
 
