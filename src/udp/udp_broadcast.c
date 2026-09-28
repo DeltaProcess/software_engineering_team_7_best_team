@@ -10,7 +10,7 @@
 int broadcast(const char* networkAddress) {
     int sockfd;
     struct sockaddr_in broadcast_addr;
-    char broadcast_message[] = "Hello, UDP Broadcast!";
+    char broadcast_message[] = "202";
     
     // Create a UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);

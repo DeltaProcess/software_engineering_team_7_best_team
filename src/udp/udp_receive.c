@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 
 #define PORT 7501 // Replaced with the Project overview specified receiver port
+#define REPLY_PORT 7500
 
 int receive() {
     int sockfd;
@@ -44,6 +45,23 @@ int receive() {
         // Print the received data
         buffer[num_bytes] = '\0'; // Null-terminate the received data
         printf("Received from %s:%d: %s\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port), buffer);
+        
+        // Parse "shooter:target" and reply with the equipment id that was hit
+        int shooter, target;
+        if (sscanf(buffer, "%d:%d", &shooter, &target) == 2) {
+            char reply[16];
+            snprintf(reply, sizeof(reply), "%d", target);
+
+            struct sockaddr_in reply_addr = client_addr;
+            reply_addr.sin_port = htons(REPLY_PORT);
+
+            if (sendto(sockfd, reply, strlen(reply), 0,
+                       (struct sockaddr*)&reply_addr, sizeof(reply_addr)) == -1) {
+                perror("sendto");
+            } else {
+                printf("Replied with: %s\n", reply);
+            }
+        }
     }
 
     // Close the socket

@@ -10,10 +10,13 @@ set(CMAKE_CXX_STANDARD 14)
 #openCV and boost packages
 find_package(OpenCV REQUIRED)
 
+#threads package
+find_package(Threads REQUIRED)
+
 #set source (.c, .cc, .cpp) and header files
 file(GLOB CPPTK_SOURCE "lib/cpptk-1.0.2/*.cc" "lib/cpptk-1.0.2/base/*.cc")
 file(GLOB SOURCE_FILES "src/*.cpp" "src/udp/*.c")
-file(GLOB HEADER_FILES "src/*.h")
+file(GLOB HEADER_FILES "src/*.h" "src/udp/*.h")
 
 #create main.exe
 add_executable(main ${SOURCE_FILES} ${HEADER_FILES} ${CPPTK_SOURCE})
@@ -24,8 +27,12 @@ target_include_directories(main PRIVATE "/usr/include/tcl/")
 target_include_directories(main PRIVATE "/usr/include/tk/")
 target_include_directories(main PRIVATE "/usr/opencv4/")
 
-#link tcl, tk, pqxx, and openCV libraries
+#link tcl, tk, pqxx, openCV, and threads libraries
 target_link_libraries(main PRIVATE tcl)
 target_link_libraries(main PRIVATE tk)
 target_link_libraries(main PRIVATE pqxx)
 target_link_libraries(main PRIVATE ${OpenCV_LIBS})
+target_link_libraries(main PRIVATE Threads::Threads)
+
+#include usr directories because STUPID
+include_directories(/usr/include/tcl /usr/include/tk)
