@@ -10,9 +10,13 @@ class Interface {
 		~Interface();
 		void splash();
 		void importImage(std::string path, int size_x, int size_y);
+<<<<<<< HEAD
 		static void getPlayerRed();
 		static void getPlayerGreen();
 		
+=======
+		static std::string* getPlayer();
+>>>>>>> c61ac978f4f7577dbb3df5d6754806a031c378a8
 	private:
 		std::string str;
 		std::string tmp_img;
