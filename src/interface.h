@@ -7,7 +7,6 @@
 class Interface {
 	public:
 		Interface(char* arg);
-		~Interface();
 		void splash();
 		void importImage(std::string path, int size_x, int size_y);
 		static void getPlayerRed();

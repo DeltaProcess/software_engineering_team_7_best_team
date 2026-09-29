@@ -20,16 +20,16 @@ Database Interface::database;
 
 Interface::Interface(char* arg) {
 	init(arg);
-	
+
 	this->tmp_img = "assets/images/tmp.png";
-	
+
 	// splash screen
 	importImage("assets/images/logo.jpg", 300, 300);
 	button(".b") -image(images(create, photo, "logo") -file(this->tmp_img));
 	pack(".b") -expand(true) -fill("both");
 	update();
 	splash();
-	
+
 	// red and green team labels
 	label(".l1") -width(40) -text("Red Team") -fg("red") -bg("black");
 	label(".l2") -width(40) -text("Green Team") -fg("green") -bg("black");
@@ -43,7 +43,7 @@ Interface::Interface(char* arg) {
 	grid(configure, ".t2") -column(1) -row(1);
 	".t1" << configure() -state("disabled");
 	".t2" << configure() -state("disabled");
-	
+
 	// red and green team entries
 	entry(".e1") -textvariable(this->redTeamID) -width(20) -invalidcommand("bell");
 	entry(".e2") -textvariable(this->redTeamName) -width(20) -invalidcommand("bell");
@@ -57,19 +57,15 @@ Interface::Interface(char* arg) {
 	".e2" << insert(0, "codename:");
 	".e3" << insert(0, "id:");
 	".e4" << insert(0, "codename:");
-	
+
 	// add user
 	button(".b1") -text("Enter Player") -command(this->getPlayerRed);
 	grid(configure, ".b1") -column(0) -row(4);
-	
+
 	button(".b2") -text("Enter Player") -command(this->getPlayerGreen);
 	grid(configure, ".b2") -column(1) -row(4);
-	
-	runEventLoop();
-}
 
-Interface::~Interface() {
-	
+	runEventLoop();
 }
 
 // remove splash screen
@@ -88,10 +84,10 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	Mat dst;
 	Size s(size_x, size_y);
 	resize(src, dst, s);
-	
+
 	std::vector<uchar> buf;
 	imencode(".png", dst, buf);
-	
+
 	std::ofstream ofs(this->tmp_img, std::ofstream::out);
 	ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
 	ofs.close();
@@ -114,7 +110,7 @@ void Interface::getPlayerRed() {
 		".t1" << configure() -state("normal");
 		".t1" << insert("0.0", redTeamID + "\t\t" + database.searchID(id) + "\n");
 	}
-	
+
 	".t1" << configure() -state("disabled");	
 }
 

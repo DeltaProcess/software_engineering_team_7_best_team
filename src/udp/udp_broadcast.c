@@ -11,21 +11,21 @@ int broadcast(const char* networkAddress) {
     int sockfd;
     struct sockaddr_in broadcast_addr;
     char broadcast_message[] = "202";
-    
+
     // Create a UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd == -1) {
         printf("unable to create socket\n");
         exit(1);
     }
-    
+
     // Set socket options to allow broadcast
     int broadcast_enable = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcast_enable, sizeof(broadcast_enable)) == -1 ) {
         printf("unable to enable broadcasts\n");
         exit(1);
     }
-    
+
     // Initialize the broadcast address structure
     memset(&broadcast_addr, 0, sizeof(broadcast_addr));
     broadcast_addr.sin_family = AF_INET;
@@ -34,7 +34,7 @@ int broadcast(const char* networkAddress) {
         perror("inet_pton");
         exit(1);
     }
-    
+
     // Send the broadcast message
     ssize_t bytes_sent = sendto(sockfd, broadcast_message, strlen(broadcast_message), 0,
                                 (struct sockaddr*)&broadcast_addr, sizeof(broadcast_addr));
@@ -44,7 +44,7 @@ int broadcast(const char* networkAddress) {
     } else {
         printf("Sent %ld bytes to %s:%d\n", bytes_sent, networkAddress, PORT);
     }
-    
+
     close(sockfd);
     return 0;
 }
