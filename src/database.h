@@ -4,16 +4,25 @@
 #include <iostream>
 #include <pqxx/pqxx>
 #include <string>
+#include <map>
+#include "player.h"
 
 class Database {
 	public:
-		Database();
-		void printTable();
-		std::string searchID(int id);
-		void addPlayer(int id, std::string codename);
-		void editCodename(int id, std::string codename);
+		static pqxx::connection& conn();
+		static void printTable();
+		static std::string searchID(int id);
+		static void addPlayerToDatabase(int id, std::string codename);
+		static void editCodename(int id, std::string codename);
+		
+		static int addPlayerToPlayers(int id, std::string codename, Player::Team team, int equipmentID);
+		static std::map<int, Player> getPlayers(Player::Team team);
+		static bool friendlyFire(int eqID1, int eqID2);
+		
 	private:
-		pqxx::connection c;
+		static pqxx::connection c;
+		static std::map<int, Player> players;
 };
+
 
 #endif

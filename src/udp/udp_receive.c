@@ -51,7 +51,7 @@ int receive() {
         if (sscanf(buffer, "%d:%d", &shooter, &target) == 2) {
             char reply[16];
             snprintf(reply, sizeof(reply), "%d", target);
-
+			
             struct sockaddr_in reply_addr = client_addr;
             reply_addr.sin_port = htons(REPLY_PORT);
 
@@ -61,6 +61,23 @@ int receive() {
             } else {
                 printf("Replied with: %s\n", reply);
             }
+            
+            // this is a temporary fix to the friendly fire problem. whenever we actually implement the game, we use the commented code.
+            //if(Database::friendlyFire(shooter, target){ // uncomment later
+            if (shooter % 2 == target % 2){
+				printf("hi");
+				snprintf(reply, sizeof(reply), "%d", shooter);
+				struct sockaddr_in reply_addr = client_addr;
+				reply_addr.sin_port = htons(REPLY_PORT);
+
+				if (sendto(sockfd, reply, strlen(reply), 0,
+						   (struct sockaddr*)&reply_addr, sizeof(reply_addr)) == -1) {
+					perror("sendto");
+				} else {
+					printf("Replied with: %s\n", reply);
+				}
+			}
+
         }
     }
 

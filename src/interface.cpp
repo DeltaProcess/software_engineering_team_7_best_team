@@ -8,15 +8,11 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <map>
 
 using namespace Tk;
 using namespace cv;
 
-std::string Interface::redTeamID;
-std::string Interface::redTeamName;
-std::string Interface::greenTeamID;
-std::string Interface::greenTeamName;
-Database Interface::database;
 
 Interface::Interface(char* arg) {
 	init(arg);
@@ -29,41 +25,58 @@ Interface::Interface(char* arg) {
 	pack(".b") -expand(true) -fill("both");
 	update();
 	splash();
+	
+	
+	
 
 	// red and green team labels
 	label(".l1") -width(40) -text("Red Team") -fg("red") -bg("black");
 	label(".l2") -width(40) -text("Green Team") -fg("green") -bg("black");
 	grid(configure, ".l1") -column(0) -row(0);
 	grid(configure, ".l2") -column(1) -row(0);
-	
-	// red and green team text display
-	textw(".t1") -width(40) -height(30) -fg("red") -bg("black");
-	textw(".t2") -width(40) -height(30) -fg("green") -bg("black");
+    
+   // red and green team text display
+	textw(".t1") -width(40) -height(30) -fg("white") -bg("#4d0000") -tabs("60 240");
+	textw(".t2") -width(40) -height(30) -fg("white") -bg("#004d00") -tabs("60 240");
 	grid(configure, ".t1") -column(0) -row(1);
 	grid(configure, ".t2") -column(1) -row(1);
+	".t1" << insert("0.0", "ID\tCodename\tEquipment\n");
+	".t2" << insert("0.0", "ID\tCodename\tEquipment\n");
 	".t1" << configure() -state("disabled");
 	".t2" << configure() -state("disabled");
 
-	// red and green team entries
-	entry(".e1") -textvariable(this->redTeamID) -width(20) -invalidcommand("bell");
-	entry(".e2") -textvariable(this->redTeamName) -width(20) -invalidcommand("bell");
-	entry(".e3") -textvariable(this->greenTeamID) -width(20) -invalidcommand("bell");
-	entry(".e4") -textvariable(this->greenTeamName) -width(20) -invalidcommand("bell");
-	grid(configure, ".e1") -column(0) -row(2);
-	grid(configure, ".e2") -column(0) -row(3);
-	grid(configure, ".e3") -column(1) -row(2);
-	grid(configure, ".e4") -column(1) -row(3);
-	".e1" << insert(0, "id:");
-	".e2" << insert(0, "codename:");
-	".e3" << insert(0, "id:");
-	".e4" << insert(0, "codename:");
+
+
+	// everything below the two team boxes
+	frame(".f1");
+	grid(configure, ".f1") -column(0) -row(3) -pady(10) -columnspan(2);
+	
+	// entry text box labels
+	label(".f1.l1") -text("ID");
+	label(".f1.l2") -text("Codename");
+	label(".f1.l3") -text("Equipment ID");
+	grid(configure, ".f1.l1") -column(0) -row(3);
+	grid(configure, ".f1.l2") -column(1) -row(3);
+	grid(configure, ".f1.l3") -column(2) -row(3);
+	
+	// team entries
+	entry(".f1.e1") -width(20) -invalidcommand("bell");
+	entry(".f1.e2") -width(20) -invalidcommand("bell");
+	entry(".f1.e3") -width(20) -invalidcommand("bell");
+	grid(configure, ".f1.e1") -column(0) -row(4) -padx(10);
+	grid(configure, ".f1.e2") -column(1) -row(4) -padx(10);
+	grid(configure, ".f1.e3") -column(2) -row(4) -padx(10);
+	
+	// lets the user hti enter to save changes/query database
+	bind(".f1.e1", "<Return>", enterID);
+	bind(".f1.e2", "<Return>", enterName);
 
 	// add user
-	button(".b1") -text("Enter Player") -command(this->getPlayerRed);
-	grid(configure, ".b1") -column(0) -row(4);
+	button(".b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white");
+	grid(configure, ".b1") -column(0) -row(4) -pady(10);
 
-	button(".b2") -text("Enter Player") -command(this->getPlayerGreen);
-	grid(configure, ".b2") -column(1) -row(4);
+	button(".b2") -text("Add to Green") -command(this->addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white");
+	grid(configure, ".b2") -column(1) -row(4) -pady(10);
 
 	runEventLoop();
 }
@@ -93,44 +106,130 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	ofs.close();
 }
 
-// enter red player
-void Interface::getPlayerRed() {
-	int id = std::stoi(redTeamID);
-	if ((id&1) == 0) {
+void Interface::enterID() {
+	int id;
+	try {
+		id = std::stoi(".f1.e1" << get());
+	} catch(const std::exception &e) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer.") -messagetype(ok);	
 		return;
 	}
-	// check database match
-	if (database.searchID(id) != "") {
-		".t1" << configure() -state("normal");
-		".t1" << insert("0.0", redTeamID + "\t\t" + database.searchID(id) + "\n");
-	}
-	// check codename filled out
-	else if(redTeamName != "") {
-		database.addPlayer(id, redTeamName);
-		".t1" << configure() -state("normal");
-		".t1" << insert("0.0", redTeamID + "\t\t" + database.searchID(id) + "\n");
-	}
-
-	".t1" << configure() -state("disabled");	
+		if (Database::searchID(id) != "") {
+			".f1.e2" << deletetext("0", end);
+			".f1.e2" << insert("0", Database::searchID(id));
+			focus(".f1.e3"); // focuses on equipment text box if codename is found
+		} else {
+			focus(".f1.e2");
+		}
 }
 
-// enter green player
-void Interface::getPlayerGreen() {
-	int id = std::stoi(greenTeamID);
-	if (id&1) {
+void Interface::enterName() {
+	int id;
+	try {
+		id = std::stoi(".f1.e1" << get());
+	} catch(const std::exception &e) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer.") -messagetype(ok);
 		return;
 	}
-	// check database match
-	if (database.searchID(id) != ""){ 
-		".t2" << configure() -state("normal");
-		".t2" << insert("0.0", greenTeamID + "\t\t" + database.searchID(id) + "\n");
+	std::string codename = ".f1.e2" << get();
+	if (!codename.empty()) {
+		if (Database::searchID(id) == "") {
+			Database::addPlayerToDatabase(id, codename);
+		} else {
+			Database::editCodename(id, codename);
+		}
 	}
-	// check codename filled out
-	else if(greenTeamName != "") {
-		database.addPlayer(id, greenTeamName);
-		".t1" << configure() -state("normal");
-		".t2" << insert("0.0", greenTeamID + "\t\t" + greenTeamName + "\n");
-	}
-
-	".t1" << configure() -state("disabled");	
+	focus(".f1.e3");
 }
+
+// since the buttons cannot carry parameters i had to create two helper functions
+void Interface::addRedPlayer() {
+	addPlayer(Player::Team::RED);
+}	
+void Interface::addGreenPlayer() {
+		addPlayer(Player::Team::GREEN);
+}	
+
+void Interface::addPlayer(Player::Team team) {
+	int id;
+	int eqID;
+	try { // checks for valid id
+		id = std::stoi(".f1.e1" << get());
+	} catch(const std::exception &e) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer for the ID.") -messagetype(ok);	
+		focus(".f1.e1");
+		return;
+	}
+	
+	try { //checks for valid equipment id, also includes even and odd checks
+		eqID = std::stoi(".f1.e3" << get());
+		std::cout << std::to_string((eqID&team)) <<std::endl;
+		if ((eqID&1) != team) { 
+			if (team == Player::Team::RED) {
+				tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Even Equipment Numbers belong to the Green Team.") -messagetype(ok);
+			} else { 
+				tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Odd Equipment Numbers belong to the Red Team.") -messagetype(ok);
+			}
+			return;
+		}
+	} catch(const std::exception &e) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer for the Equipment ID.") -messagetype(ok);	
+		focus(".f1.e3");
+		return;
+	}
+	
+	std::string codename = ".f1.e2" << get();
+	if (codename.empty()) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a Codename.") -messagetype(ok);	
+		focus(".f1.e2");
+		return;
+	}
+	
+	// status will show a dialog box with the corresponding error and will focus on what box has it
+	int status = Database::addPlayerToPlayers(id, codename, team, eqID);
+	if (status == 1) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Current ID and Codename does not match database. Please hit enter in the codename box.") -messagetype(ok);
+		focus(".f1.e2");
+		return;
+	} else if(status == 3) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Equipment ID already in use.") -messagetype(ok);	
+		focus(".f1.e3");
+		return;
+	}
+	
+	refreshDisplay();
+	
+	".f1.e1" << deletetext("0", end);
+	".f1.e2" << deletetext("0", end);
+	".f1.e3" << deletetext("0", end);
+	focus(".f1.e1");
+	
+}	
+
+
+// this refreshes both teams display every time to account for people switching teams and equipment
+void Interface::refreshDisplay() {
+	std::map<int,Player> rosterRed = Database::getPlayers(Player::Team::RED);
+	std::map<int,Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
+	
+	".t1" << configure() -state("normal");
+	".t1" << deletetext("1.0", end);
+	".t1" << insert("0.0", "ID\tCodename\tEquipment\n");
+	for (auto player: rosterRed) {
+		int eqID = player.first;
+		Player p = player.second;
+		 ".t1"  << insert("end", std::to_string(p.id) + "\t" + p.codename + "\t"+ std::to_string(eqID) + "\n");
+	}
+	".t1" << configure() -state("disabled");
+	
+	".t2" << configure() -state("normal");
+	".t2" << deletetext("1.0", end);
+	".t2" << insert("0.0", "ID\tCodename\tEquipment\n");
+	for (auto player: rosterGreen) {
+		int eqID = player.first;
+		Player p = player.second;
+		 ".t2" << insert("end", std::to_string(p.id) + "\t" + p.codename + "\t"+ std::to_string(eqID) + "\n");
+	}
+	".t2" << configure() -state("disabled");
+}	
+
