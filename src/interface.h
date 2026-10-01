@@ -9,16 +9,13 @@ class Interface {
 		Interface(char* arg);
 		void splash();
 		void importImage(std::string path, int size_x, int size_y);
-		
-		static void enterID();
-		static void enterName();
-		static void enterEquipmentID();
-		
+		static void start();
+		static void setID();
+		static void setName();
 		static void addRedPlayer();
 		static void addGreenPlayer();
 		static void addPlayer(Player::Team team);
 		static void refreshDisplay();
-		
 	private:
 		std::string tmp_img;
 };

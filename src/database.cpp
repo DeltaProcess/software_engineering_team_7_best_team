@@ -2,9 +2,6 @@
 
 using namespace std;
 
-
-
-
 std::map<int, Player> Database::players;
 
 pqxx::connection& Database::conn() {
@@ -16,7 +13,7 @@ void Database::printTable() {
 	try {
 		// starts a query
 		pqxx::work tx(conn());
-		
+
 		// gets all columns
         pqxx::result res = tx.exec("SELECT * FROM players");
 
@@ -54,7 +51,6 @@ string Database::searchID(int id) {
 	}
 }
 
-
 void Database::addPlayerToDatabase(int id, string codename) {
 	// check duplicates
 	if (searchID(id) == "") {
@@ -86,19 +82,18 @@ void Database::editCodename(int id, string codename) {
 }
 
 // player functions
-
 int Database::addPlayerToPlayers(int id, string codename, Player::Team team, int equipmentID) {
 	// if id doesnt match codename in database
 	if (searchID(id) != codename) { 
 		return 1;
 	}
-	
+
 	// if equipment id is taken
 	auto eqChange = players.find(equipmentID);
 	if (eqChange != players.end() && eqChange->second.id != id) { 
 		return 3;
 	}
-	
+
 	// loops through players to remove any duplicates and team changes
 	for (auto player: players) {
 		if(player.second.id == id) {
@@ -106,16 +101,15 @@ int Database::addPlayerToPlayers(int id, string codename, Player::Team team, int
 			break;
 		}
 	}
-	
+
 	Player temp;
 	temp.id = id;
-	temp.codename = codename;
 	temp.team = team;
+	temp.codename = codename;
 	temp.equipmentID = equipmentID;
 	players.insert({equipmentID, temp});
 	return 0;
 }
-
 
 std::map<int, Player> Database::getPlayers(Player::Team team) {
 	std::map<int, Player> roster;
@@ -126,7 +120,6 @@ std::map<int, Player> Database::getPlayers(Player::Team team) {
 	}
 	return roster;
 }
-
 
 bool Database::friendlyFire(int eqID1, int eqID2) {
 	if (players.at(eqID1).team == players.at(eqID2).team) {

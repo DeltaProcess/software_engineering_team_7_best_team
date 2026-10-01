@@ -1,4 +1,5 @@
 #include "interface.h"
+#include "udp/udp_broadcast.h"
 #include "database.h"
 #include "cpptk.h"
 
@@ -13,7 +14,6 @@
 using namespace Tk;
 using namespace cv;
 
-
 Interface::Interface(char* arg) {
 	init(arg);
 
@@ -25,17 +25,14 @@ Interface::Interface(char* arg) {
 	pack(".b") -expand(true) -fill("both");
 	update();
 	splash();
-	
-	
-	
 
 	// red and green team labels
 	label(".l1") -width(40) -text("Red Team") -fg("red") -bg("black");
 	label(".l2") -width(40) -text("Green Team") -fg("green") -bg("black");
 	grid(configure, ".l1") -column(0) -row(0);
 	grid(configure, ".l2") -column(1) -row(0);
-    
-   // red and green team text display
+
+	// red and green team text display
 	textw(".t1") -width(40) -height(30) -fg("white") -bg("#4d0000") -tabs("60 240");
 	textw(".t2") -width(40) -height(30) -fg("white") -bg("#004d00") -tabs("60 240");
 	grid(configure, ".t1") -column(0) -row(1);
@@ -45,12 +42,10 @@ Interface::Interface(char* arg) {
 	".t1" << configure() -state("disabled");
 	".t2" << configure() -state("disabled");
 
-
-
 	// everything below the two team boxes
 	frame(".f1");
 	grid(configure, ".f1") -column(0) -row(3) -pady(10) -columnspan(2);
-	
+
 	// entry text box labels
 	label(".f1.l1") -text("ID");
 	label(".f1.l2") -text("Codename");
@@ -58,7 +53,7 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.l1") -column(0) -row(3);
 	grid(configure, ".f1.l2") -column(1) -row(3);
 	grid(configure, ".f1.l3") -column(2) -row(3);
-	
+
 	// team entries
 	entry(".f1.e1") -width(20) -invalidcommand("bell");
 	entry(".f1.e2") -width(20) -invalidcommand("bell");
@@ -66,17 +61,21 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.e1") -column(0) -row(4) -padx(10);
 	grid(configure, ".f1.e2") -column(1) -row(4) -padx(10);
 	grid(configure, ".f1.e3") -column(2) -row(4) -padx(10);
-	
-	// lets the user hti enter to save changes/query database
-	bind(".f1.e1", "<Return>", enterID);
-	bind(".f1.e2", "<Return>", enterName);
+
+	// let user save changes/query database with 'enter' key
+	bind(".f1.e1", "<Return>", setID);
+	bind(".f1.e2", "<Return>", setName);
 
 	// add user
-	button(".b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white");
-	grid(configure, ".b1") -column(0) -row(4) -pady(10);
+	button(".f1.b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white");
+	grid(configure, ".f1.b1") -column(0) -row(5) -pady(10);
 
-	button(".b2") -text("Add to Green") -command(this->addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white");
-	grid(configure, ".b2") -column(1) -row(4) -pady(10);
+	button(".f1.b2") -text("Add to Green") -command(this->addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white");
+	grid(configure, ".f1.b2") -column(2) -row(5) -pady(10);
+
+	// start game
+	button(".f1.b3") -text("Start") -command(this->start) -fg("white") -bg("black") -activebackground("gray");
+	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
 
 	runEventLoop();
 }
@@ -106,7 +105,12 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	ofs.close();
 }
 
-void Interface::enterID() {
+void Interface::start() {
+	std::string networkAddress = "127.0.0.1";
+	broadcast(networkAddress.c_str());
+}
+
+void Interface::setID() {
 	int id;
 	try {
 		id = std::stoi(".f1.e1" << get());
@@ -114,16 +118,17 @@ void Interface::enterID() {
 		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer.") -messagetype(ok);	
 		return;
 	}
-		if (Database::searchID(id) != "") {
-			".f1.e2" << deletetext("0", end);
-			".f1.e2" << insert("0", Database::searchID(id));
-			focus(".f1.e3"); // focuses on equipment text box if codename is found
-		} else {
-			focus(".f1.e2");
-		}
+	if (Database::searchID(id) != "") {
+		".f1.e2" << deletetext("0", end);
+		".f1.e2" << insert("0", Database::searchID(id));
+		// focus on equipment text box if codename is found
+		focus(".f1.e3");
+	} else {
+		focus(".f1.e2");
+	}
 }
 
-void Interface::enterName() {
+void Interface::setName() {
 	int id;
 	try {
 		id = std::stoi(".f1.e1" << get());
@@ -142,26 +147,31 @@ void Interface::enterName() {
 	focus(".f1.e3");
 }
 
-// since the buttons cannot carry parameters i had to create two helper functions
+// red helper function
 void Interface::addRedPlayer() {
 	addPlayer(Player::Team::RED);
-}	
+}
+
+// green helper function
 void Interface::addGreenPlayer() {
-		addPlayer(Player::Team::GREEN);
-}	
+	addPlayer(Player::Team::GREEN);
+}
 
 void Interface::addPlayer(Player::Team team) {
 	int id;
 	int eqID;
-	try { // checks for valid id
+
+	// check for valid id
+	try {
 		id = std::stoi(".f1.e1" << get());
 	} catch(const std::exception &e) {
 		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer for the ID.") -messagetype(ok);	
 		focus(".f1.e1");
 		return;
 	}
-	
-	try { //checks for valid equipment id, also includes even and odd checks
+
+	// check for valid equipment id, also includes even and odd checks
+	try {
 		eqID = std::stoi(".f1.e3" << get());
 		std::cout << std::to_string((eqID&team)) <<std::endl;
 		if ((eqID&1) != team) { 
@@ -177,14 +187,14 @@ void Interface::addPlayer(Player::Team team) {
 		focus(".f1.e3");
 		return;
 	}
-	
+
 	std::string codename = ".f1.e2" << get();
 	if (codename.empty()) {
 		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a Codename.") -messagetype(ok);	
 		focus(".f1.e2");
 		return;
 	}
-	
+
 	// status will show a dialog box with the corresponding error and will focus on what box has it
 	int status = Database::addPlayerToPlayers(id, codename, team, eqID);
 	if (status == 1) {
@@ -196,14 +206,13 @@ void Interface::addPlayer(Player::Team team) {
 		focus(".f1.e3");
 		return;
 	}
-	
+
 	refreshDisplay();
-	
+
 	".f1.e1" << deletetext("0", end);
 	".f1.e2" << deletetext("0", end);
 	".f1.e3" << deletetext("0", end);
 	focus(".f1.e1");
-	
 }	
 
 
@@ -211,7 +220,7 @@ void Interface::addPlayer(Player::Team team) {
 void Interface::refreshDisplay() {
 	std::map<int,Player> rosterRed = Database::getPlayers(Player::Team::RED);
 	std::map<int,Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
-	
+
 	".t1" << configure() -state("normal");
 	".t1" << deletetext("1.0", end);
 	".t1" << insert("0.0", "ID\tCodename\tEquipment\n");
@@ -221,7 +230,7 @@ void Interface::refreshDisplay() {
 		 ".t1"  << insert("end", std::to_string(p.id) + "\t" + p.codename + "\t"+ std::to_string(eqID) + "\n");
 	}
 	".t1" << configure() -state("disabled");
-	
+
 	".t2" << configure() -state("normal");
 	".t2" << deletetext("1.0", end);
 	".t2" << insert("0.0", "ID\tCodename\tEquipment\n");
@@ -231,5 +240,4 @@ void Interface::refreshDisplay() {
 		 ".t2" << insert("end", std::to_string(p.id) + "\t" + p.codename + "\t"+ std::to_string(eqID) + "\n");
 	}
 	".t2" << configure() -state("disabled");
-}	
-
+}

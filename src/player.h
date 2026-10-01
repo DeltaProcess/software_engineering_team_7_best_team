@@ -11,7 +11,7 @@ struct Player {
 	int id;
 	std::string codename;
 	Team team;
-	int equipmentID;	
+	int equipmentID;
 };
 
 #endif

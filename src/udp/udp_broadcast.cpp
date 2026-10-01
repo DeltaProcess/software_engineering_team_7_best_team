@@ -1,11 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 7500 // Port number to send the broadcast
-#define NETWORK_ADDRESS "127.0.0.1" // Replaced with the Project overview specified network address
+#define PORT 7500
+#define NETWORK_ADDRESS "127.0.0.1"
 
 int broadcast(const char* networkAddress) {
     int sockfd;
@@ -15,14 +15,14 @@ int broadcast(const char* networkAddress) {
     // Create a UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd == -1) {
-        printf("unable to create socket\n");
+        std::cout << "unable to create socket" << std::endl;
         exit(1);
     }
 
     // Set socket options to allow broadcast
     int broadcast_enable = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcast_enable, sizeof(broadcast_enable)) == -1 ) {
-        printf("unable to enable broadcasts\n");
+        std::cout << "unable to enable broadcasts" << std::endl;
         exit(1);
     }
 
@@ -31,7 +31,7 @@ int broadcast(const char* networkAddress) {
     broadcast_addr.sin_family = AF_INET;
     broadcast_addr.sin_port = htons(PORT);
     if (inet_pton(AF_INET, networkAddress, &broadcast_addr.sin_addr) <= 0) {
-        perror("inet_pton");
+        std::cerr << "inet_pton" << std::endl;
         exit(1);
     }
 
@@ -40,12 +40,11 @@ int broadcast(const char* networkAddress) {
                                 (struct sockaddr*)&broadcast_addr, sizeof(broadcast_addr));
     
     if (bytes_sent == -1) {
-        perror("sendto");
+        std::cerr << "sendto" << std::endl;
     } else {
-        printf("Sent %ld bytes to %s:%d\n", bytes_sent, networkAddress, PORT);
+        std::cout << "sent " << bytes_sent << " bytes to " << networkAddress << ":" << PORT << std::endl;
     }
 
     close(sockfd);
     return 0;
 }
-

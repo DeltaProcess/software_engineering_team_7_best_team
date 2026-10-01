@@ -1,11 +1,12 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include "player.h"
+
 #include <iostream>
 #include <pqxx/pqxx>
 #include <string>
 #include <map>
-#include "player.h"
 
 class Database {
 	public:
@@ -14,15 +15,12 @@ class Database {
 		static std::string searchID(int id);
 		static void addPlayerToDatabase(int id, std::string codename);
 		static void editCodename(int id, std::string codename);
-		
 		static int addPlayerToPlayers(int id, std::string codename, Player::Team team, int equipmentID);
 		static std::map<int, Player> getPlayers(Player::Team team);
 		static bool friendlyFire(int eqID1, int eqID2);
-		
 	private:
 		static pqxx::connection c;
 		static std::map<int, Player> players;
 };
-
 
 #endif

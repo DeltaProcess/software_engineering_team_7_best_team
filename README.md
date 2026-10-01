@@ -12,6 +12,8 @@
 
 ## First Time Installation
 
+**IMPORTANT NOTE FOR DEBIAN 11**: Debian 11 has reached EOL, as such you will have to follow the instructions below to install dependencies. If you have a newer version of debian, skip to the 'supported debian versions' portion to install dependencies.
+
 Run the following commands in order to update the VM so dependencies can install:
 
 1. `sudo nano`
@@ -34,6 +36,8 @@ Run the following commands in order to update the VM so dependencies can install
 7. Y
 8. ctrl + X
 9. `sudo apt update`
+
+**SUPPORTED DEBIAN VERSIONS**
 
 Then, run the following commands to install all dependencies and 
 

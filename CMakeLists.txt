@@ -15,7 +15,7 @@ find_package(Threads REQUIRED)
 
 #set source (.c, .cc, .cpp) and header files
 file(GLOB CPPTK_SOURCE "lib/cpptk-1.0.2/*.cc" "lib/cpptk-1.0.2/base/*.cc")
-file(GLOB SOURCE_FILES "src/*.cpp" "src/udp/*.c")
+file(GLOB SOURCE_FILES "src/*.cpp" "src/udp/*.cpp")
 file(GLOB HEADER_FILES "src/*.h" "src/udp/*.h")
 
 #create main.exe
