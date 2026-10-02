@@ -3,8 +3,8 @@
 
 #include "player.h"
 
-#include <iostream>
 #include <pqxx/pqxx>
+#include <iostream>
 #include <string>
 #include <map>
 
