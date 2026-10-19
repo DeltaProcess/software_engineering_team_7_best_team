@@ -81,7 +81,7 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
 	bind(".", "<F5>", start);
 	
-	// clear players buttons
+	// clear player buttons
 	button(".f1.b4") -text("Clear Red") -command(this->clearRedPlayers) -fg("white") -bg("#6b3333") -activebackground("#4b2222") -activeforeground("white") -width(10);
 	grid(configure, ".f1.b4") -column(0) -row(6) -pady(10);
 	
