@@ -15,6 +15,10 @@ class Interface {
 		static void addRedPlayer();
 		static void addGreenPlayer();
 		static void addPlayer(Player::Team team);
+		static void clearRedPlayers();
+		static void clearGreenPlayers();
+		static void clearAllPlayers();
+		static void clearPlayers(bool red, bool green);
 		static void refreshDisplay();
 	private:
 		std::string tmp_img;

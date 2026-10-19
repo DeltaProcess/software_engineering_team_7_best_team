@@ -128,5 +128,17 @@ bool Database::friendlyFire(int eqID1, int eqID2) {
 	return false;
 }
 
-
+void Database::clearPlayers(bool red, bool green) {
+	for(auto it = players.begin(); it != players.end();) {
+		bool isRed = (it -> second.team == Player::Team::RED);
+		bool isGreen = (it -> second.team == Player::Team::GREEN);
+		
+		if ((red && isRed) || (green && isGreen)) {
+			it = players.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+}
 
