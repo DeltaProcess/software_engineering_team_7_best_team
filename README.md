@@ -35,12 +35,12 @@ Run the following commands in order to update the VM so dependencies can install
 6. `/etc/apt/sources.list/`
 7. Y
 8. ctrl + X
-9. `sudo apt update`
 
 **SUPPORTED DEBIAN VERSIONS**
 
 Then, run the following commands to install all dependencies and our code:
 
+9. `sudo apt update`
 10. `git clone https://github.com/DeltaProcess/software_engineering_team_7_best_team`
 11. `cd software_engineering_team_7_best_team`
 12. `bash install.sh`
