@@ -16,6 +16,9 @@ using namespace cv;
 
 Interface::Interface(char* arg) {
 	init(arg);
+	
+	// edit window title (again because i dont want to do my actual part - Ben)
+	wm("title", ".", "                Photon7");
 
 	this->tmp_img = "assets/images/tmp.png";
 
@@ -33,8 +36,8 @@ Interface::Interface(char* arg) {
 	grid(configure, ".l2") -column(1) -row(0);
 
 	// red and green team text display
-	textw(".t1") -width(40) -height(30) -fg("white") -bg("#4d0000") -tabs("60 240");
-	textw(".t2") -width(40) -height(30) -fg("white") -bg("#004d00") -tabs("60 240");
+	textw(".t1") -width(40) -height(25) -fg("white") -bg("#4d0000") -tabs("60 240");
+	textw(".t2") -width(40) -height(25) -fg("white") -bg("#004d00") -tabs("60 240");
 	grid(configure, ".t1") -column(0) -row(1);
 	grid(configure, ".t2") -column(1) -row(1);
 	".t1" << insert("0.0", "ID\tCodename\tEquipment\n");
@@ -76,6 +79,16 @@ Interface::Interface(char* arg) {
 	// start game
 	button(".f1.b3") -text("Start") -command(this->start) -fg("white") -bg("black") -activebackground("gray");
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
+	
+	// recenter window (because it was annoying me and i dont want to start on my actual part of the project - Ben)
+	update();
+	int screen_width = std::stoi(winfo("screenwidth", "."));
+	int screen_height = std::stoi(winfo("screenheight", "."));
+	int window_width = std::stoi(winfo("reqwidth", "."));
+	int window_height = std::stoi(winfo("reqheight", "."));
+	int xpos = (screen_width - window_width) / 2;
+	int ypos = (screen_height - window_height) / 2;
+	wm(geometry, ".", std::to_string(window_width) + "x" + std::to_string(window_height) + "+" + std::to_string(xpos) + "+" + std::to_string(ypos));
 
 	runEventLoop();
 }
