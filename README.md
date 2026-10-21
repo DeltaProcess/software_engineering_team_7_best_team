@@ -45,6 +45,11 @@ Then, run the following commands to install all dependencies and our code:
 11. `cd software_engineering_team_7_best_team`
 12. `bash install.sh`
 
+## First Time Running
+
+1. `cd software_engineering_team_7_best_team`
+2. `./build/main`
+
 ## Running The Software
 
 1. `cd software_engineering_team_7_best_team`
