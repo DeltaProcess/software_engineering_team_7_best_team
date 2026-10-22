@@ -36,8 +36,8 @@ Interface::Interface(char* arg) {
 	grid(configure, ".l2") -column(1) -row(0);
 
 	// red and green team text display
-	textw(".t1") -width(40) -height(20) -fg("white") -bg("#4d0000") -tabs("60 240");
-	textw(".t2") -width(40) -height(20) -fg("white") -bg("#004d00") -tabs("60 240");
+	textw(".t1") -width(40) -height(20) -fg("white") -bg("#4d0000") -tabs("60 240") -highlightbackground("#0000fe") -highlightthickness(2);
+	textw(".t2") -width(40) -height(20) -fg("white") -bg("#004d00") -tabs("60 240") -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".t1") -column(0) -row(1);
 	grid(configure, ".t2") -column(1) -row(1);
 	".t1" << insert("0.0", "ID\tCodename\tEquipment\n");
@@ -58,9 +58,9 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.l3") -column(2) -row(3);
 
 	// team entries
-	entry(".f1.e1") -width(20) -invalidcommand("bell");
-	entry(".f1.e2") -width(20) -invalidcommand("bell");
-	entry(".f1.e3") -width(20) -invalidcommand("bell");
+	entry(".f1.e1") -width(20) -invalidcommand("bell") -highlightbackground("#0000fe") -highlightthickness(2);
+	entry(".f1.e2") -width(20) -invalidcommand("bell") -highlightbackground("#0000fe") -highlightthickness(2);
+	entry(".f1.e3") -width(20) -invalidcommand("bell") -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.e1") -column(0) -row(4) -padx(10);
 	grid(configure, ".f1.e2") -column(1) -row(4) -padx(10);
 	grid(configure, ".f1.e3") -column(2) -row(4) -padx(10);
@@ -70,25 +70,25 @@ Interface::Interface(char* arg) {
 	bind(".f1.e2", "<Return>", setName);
 
 	// add user
-	button(".f1.b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white") -width(10);
+	button(".f1.b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b1") -column(0) -row(5) -pady(10);
 
-	button(".f1.b2") -text("Add to Green") -command(this->addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white") -width(10);
+	button(".f1.b2") -text("Add to Green") -command(this->addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b2") -column(2) -row(5) -pady(10);
 
 	// start game
-	button(".f1.b3") -text("Start") -command(this->start) -fg("white") -bg("black") -activebackground("gray") -width(10);
+	button(".f1.b3") -text("Start") -command(this->start) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
 	bind(".", "<F5>", start);
 	
 	// clear player buttons
-	button(".f1.b4") -text("Clear Red") -command(this->clearRedPlayers) -fg("white") -bg("#6b3333") -activebackground("#4b2222") -activeforeground("white") -width(10);
+	button(".f1.b4") -text("Clear Red") -command(this->clearRedPlayers) -fg("white") -bg("#6b3333") -activebackground("#4b2222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b4") -column(0) -row(6) -pady(10);
 	
-	button(".f1.b5") -text("Clear Green") -command(this->clearGreenPlayers) -fg("white") -bg("#336b33") -activebackground("#224b22") -activeforeground("white") -width(10);
+	button(".f1.b5") -text("Clear Green") -command(this->clearGreenPlayers) -fg("white") -bg("#336b33") -activebackground("#224b22") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b5") -column(2) -row(6) -pady(10);
 	
-	button(".f1.b6") -text("Clear All") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10);
+	button(".f1.b6") -text("Clear All") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b6") -column(1) -row(6) -pady(10);
 	
 	bind(".", "<F12>", clearAllPlayers);
