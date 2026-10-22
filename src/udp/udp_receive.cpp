@@ -65,19 +65,22 @@ int receive() {
                 std::cout << "Replied with: " << reply << std::endl;
             }
 
-            // friendly fire detection
-			if (Database::friendlyFire(shooter, target)) {
-				snprintf(reply, sizeof(reply), "%d", shooter);
-				struct sockaddr_in reply_addr = client_addr;
-				reply_addr.sin_port = htons(REPLY_PORT);
+            // friendly fire detection (will be ignored, for now, if the target is a base)
+            if ((target != 43) && (target != 53)) {
+                if (Database::friendlyFire(shooter, target)) {
+                    snprintf(reply, sizeof(reply), "%d", shooter);
+                    struct sockaddr_in reply_addr = client_addr;
+                    reply_addr.sin_port = htons(REPLY_PORT);
 
-				if (sendto(sockfd, reply, strlen(reply), 0,
-						   (struct sockaddr*)&reply_addr, sizeof(reply_addr)) == -1) {
-					std::cerr << "sendto" << std::endl;
-				} else {
-					std::cout << "Replied with: " << reply << std::endl;
-				}
-			}
+                    if (sendto(sockfd, reply, strlen(reply), 0,
+                                (struct sockaddr*)&reply_addr, sizeof(reply_addr)) == -1) {
+                        std::cerr << "sendto" << std::endl;
+                    } else {
+                        std::cout << "Replied with: " << reply << std::endl;
+                    }
+                }
+            }
+			
         }
     }
 
