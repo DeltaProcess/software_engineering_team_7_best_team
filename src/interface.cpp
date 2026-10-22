@@ -295,3 +295,4 @@ void Interface::refreshDisplay() {
 	}
 	".t2" << configure() -state("disabled");
 }
+
