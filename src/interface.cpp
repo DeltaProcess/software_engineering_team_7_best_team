@@ -1,5 +1,6 @@
 #include "interface.h"
 #include "udp/udp_broadcast.h"
+#include "udp/udp_receive.h"
 #include "database.h"
 #include "cpptk.h"
 
@@ -132,6 +133,9 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 }
 
 void Interface::start() {
+	std::thread rx(receive); // moved from the commented out portion of main into interface
+	rx.detach();
+	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	std::string networkAddress = "127.0.0.1";
 	broadcast(networkAddress.c_str());
 }

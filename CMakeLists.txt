@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #openCV and threads packages
 find_package(OpenCV REQUIRED)
+find_package(Threads REQUIRED)
 
 #set source (.c, .cc, .cpp) and header files
 file(GLOB CPPTK_SOURCE "lib/cpptk-1.0.2/*.cc" "lib/cpptk-1.0.2/base/*.cc")
@@ -28,4 +29,4 @@ target_include_directories(main PRIVATE
 )
 
 #link libraries
-target_link_libraries(main PRIVATE tcl tk pqxx ${OpenCV_LIBS})
+target_link_libraries(main PRIVATE tcl tk pqxx ${OpenCV_LIBS} Threads::Threads)
