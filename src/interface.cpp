@@ -15,17 +15,17 @@
 using namespace Tk;
 using namespace cv;
 
+std::string Interface::tmp_img = "assets/images/tmp.png";
+
 Interface::Interface(char* arg) {
 	init(arg);
 	
-	// edit window title (again because i dont want to do my actual part - Ben)
+	// formatted window title
 	wm("title", ".", "                Photon7");
-
-	this->tmp_img = "assets/images/tmp.png";
 
 	// splash screen
 	importImage("assets/images/logo.jpg", 300, 300);
-	button(".b") -image(images(create, photo, "logo") -file(this->tmp_img));
+	button(".b") -image(images(create, photo, "logo") -file(tmp_img));
 	pack(".b") -expand(true) -fill("both");
 	update();
 	splash();
@@ -94,7 +94,7 @@ Interface::Interface(char* arg) {
 	
 	bind(".", "<F12>", clearAllPlayers);
 	
-	// recenter window (because it was annoying me and i dont want to start on my actual part of the project - Ben)
+	// recenter window
 	update();
 	int screen_width = std::stoi(winfo("screenwidth", "."));
 	int screen_height = std::stoi(winfo("screenheight", "."));
@@ -127,13 +127,49 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	std::vector<uchar> buf;
 	imencode(".png", dst, buf);
 
-	std::ofstream ofs(this->tmp_img, std::ofstream::out);
+	std::ofstream ofs(tmp_img, std::ofstream::out);
 	ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size());
 	ofs.close();
 }
 
+void Interface::countdown() {
+	// destroy grid elements
+	destroy(".l1");
+	destroy(".l2");
+	destroy(".t1");
+	destroy(".t2");
+	destroy(".f1");
+	
+	// create and destroy countdown elements
+	wm(geometry, ".", "=300x300");
+	for(int i = 31; i > -1; i--) {
+		std::string path = "assets/images/";
+		if(i == 31) {
+			path += "alert.jpg";
+		} else {
+			path += "countdown";
+			path += std::to_string(i);
+			path += ".jpg";
+		}
+		
+		importImage(path, 300, 300);
+		button(".b") -image(images(create, photo, "countdown") -file(tmp_img));
+		pack(".b") -expand(true) -fill("both");
+		update();
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		
+		destroy(".b");
+		images(deleteimg, "countdown");
+	}
+}
+
 void Interface::start() {
-	std::thread rx(receive); // moved from the commented out portion of main into interface
+	// displays countdown images
+	// destroys everything but root to allow for action screen
+	countdown();
+	
+	// broadcast start
+	std::thread rx(receive);
 	rx.detach();
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	std::string networkAddress = "127.0.0.1";
@@ -245,7 +281,6 @@ void Interface::addPlayer(Player::Team team) {
 	focus(".f1.e1");
 }
 
-// clear players functions
 void Interface::clearRedPlayers() {
 	Interface::clearPlayers(true, false);
 }
@@ -270,7 +305,7 @@ void Interface::clearPlayers(bool red, bool green) {
 }
 
 
-// this refreshes both teams display every time to account for people switching teams and equipment
+// refresh both teams displays
 void Interface::refreshDisplay() {
 	std::map<int,Player> rosterRed = Database::getPlayers(Player::Team::RED);
 	std::map<int,Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);

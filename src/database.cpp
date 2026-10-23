@@ -135,8 +135,7 @@ void Database::clearPlayers(bool red, bool green) {
 		
 		if ((red && isRed) || (green && isGreen)) {
 			it = players.erase(it);
-		}
-		else {
+		} else {
 			it++;
 		}
 	}

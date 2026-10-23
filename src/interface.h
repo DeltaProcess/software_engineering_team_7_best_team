@@ -8,7 +8,8 @@ class Interface {
 	public:
 		Interface(char* arg);
 		void splash();
-		void importImage(std::string path, int size_x, int size_y);
+		static void importImage(std::string path, int size_x, int size_y);
+		static void countdown();
 		static void start();
 		static void setID();
 		static void setName();
@@ -21,7 +22,7 @@ class Interface {
 		static void clearPlayers(bool red, bool green);
 		static void refreshDisplay();
 	private:
-		std::string tmp_img;
+		static std::string tmp_img;
 };
 
 #endif
