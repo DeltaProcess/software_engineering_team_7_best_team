@@ -189,7 +189,7 @@ void Interface::showPlayActionScreen() {
 
     // Title
     label(".paTitle")
-        -text("PLAY ACTION")
+        -text("PLAYER ACTION")
         -fg("white")
         -bg("black");
 
