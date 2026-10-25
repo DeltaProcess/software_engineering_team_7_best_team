@@ -11,6 +11,7 @@ class Interface {
 		static void importImage(std::string path, int size_x, int size_y);
 		static void countdown();
 		static void start();
+		static void showPlayActionScreen();
 		static void setID();
 		static void setName();
 		static void addRedPlayer();

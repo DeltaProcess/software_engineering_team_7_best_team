@@ -167,6 +167,9 @@ void Interface::start() {
 	// displays countdown images
 	// destroys everything but root to allow for action screen
 	countdown();
+
+	// display player action screen after countdown finishes
+    showPlayActionScreen();
 	
 	// broadcast start
 	std::thread rx(receive);
@@ -174,6 +177,181 @@ void Interface::start() {
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	std::string networkAddress = "127.0.0.1";
 	broadcast(networkAddress.c_str());
+}
+
+void Interface::showPlayActionScreen() {
+    // Get players already entered for each team
+    std::map<int, Player> rosterRed =
+        Database::getPlayers(Player::Team::RED);
+
+    std::map<int, Player> rosterGreen =
+        Database::getPlayers(Player::Team::GREEN);
+
+    // Title
+    label(".paTitle")
+        -text("PLAY ACTION")
+        -fg("white")
+        -bg("black");
+
+    grid(configure, ".paTitle")
+        -column(0)
+        -row(0)
+        -columnspan(2)
+        -pady(10);
+
+    // Team titles
+    label(".paRedLabel")
+        -width(40)
+        -text("RED TEAM")
+        -fg("red")
+        -bg("black");
+
+    label(".paGreenLabel")
+        -width(40)
+        -text("GREEN TEAM")
+        -fg("green")
+        -bg("black");
+
+    grid(configure, ".paRedLabel")
+        -column(0)
+        -row(1);
+
+    grid(configure, ".paGreenLabel")
+        -column(1)
+        -row(1);
+
+    // Player displays
+    textw(".paRed")
+        -width(40)
+        -height(10)
+        -fg("white")
+        -bg("#4d0000")
+        -tabs("200")
+        -highlightbackground("#0000fe")
+        -highlightthickness(2);
+
+    textw(".paGreen")
+        -width(40)
+        -height(10)
+        -fg("white")
+        -bg("#004d00")
+        -tabs("200")
+        -highlightbackground("#0000fe")
+        -highlightthickness(2);
+
+    grid(configure, ".paRed")
+        -column(0)
+        -row(2);
+
+    grid(configure, ".paGreen")
+        -column(1)
+        -row(2);
+
+    // Headers
+    ".paRed" << insert("0.0", "Codename\tScore\n");
+    ".paGreen" << insert("0.0", "Codename\tScore\n");
+
+    // Red players
+    for (auto player : rosterRed) {
+        Player p = player.second;
+
+        ".paRed" << insert(
+            "end",
+            p.codename + "\t0\n"
+        );
+    }
+
+    // Green players
+    for (auto player : rosterGreen) {
+        Player p = player.second;
+
+        ".paGreen" << insert(
+            "end",
+            p.codename + "\t0\n"
+        );
+    }
+
+    ".paRed" << configure() -state("disabled");
+    ".paGreen" << configure() -state("disabled");
+
+    // Team scores
+    label(".paRedScore")
+        -text("Red Team Score: 0")
+        -fg("red")
+        -bg("black");
+
+    label(".paGreenScore")
+        -text("Green Team Score: 0")
+        -fg("green")
+        -bg("black");
+
+    grid(configure, ".paRedScore")
+        -column(0)
+        -row(3)
+        -pady(10);
+
+    grid(configure, ".paGreenScore")
+        -column(1)
+        -row(3)
+        -pady(10);
+
+    // Play-by-play area
+    label(".paActionLabel")
+        -text("Current Game Action")
+        -fg("white")
+        -bg("black");
+
+    grid(configure, ".paActionLabel")
+        -column(0)
+        -row(4)
+        -columnspan(2);
+
+    textw(".paAction")
+        -width(80)
+        -height(10)
+        -fg("white")
+        -bg("black")
+        -highlightbackground("#0000fe")
+        -highlightthickness(2);
+
+    grid(configure, ".paAction")
+        -column(0)
+        -row(5)
+        -columnspan(2);
+
+    ".paAction" << configure() -state("disabled");
+
+    // Timer placeholder
+    label(".paTimer")
+        -text("Time Remaining: --:--")
+        -fg("white")
+        -bg("black");
+
+    grid(configure, ".paTimer")
+        -column(0)
+        -row(6)
+        -columnspan(2)
+        -pady(10);
+
+    // Resize and center window
+    update();
+
+    int screen_width = std::stoi(winfo("screenwidth", "."));
+    int screen_height = std::stoi(winfo("screenheight", "."));
+    int window_width = std::stoi(winfo("reqwidth", "."));
+    int window_height = std::stoi(winfo("reqheight", "."));
+
+    int xpos = (screen_width - window_width) / 2;
+    int ypos = (screen_height - window_height) / 2;
+
+    wm(
+        geometry,
+        ".",
+        std::to_string(window_width) + "x" +
+        std::to_string(window_height) + "+" +
+        std::to_string(xpos) + "+" +
+        std::to_string(ypos)
+    );
 }
 
 void Interface::setID() {
