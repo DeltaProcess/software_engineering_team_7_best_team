@@ -69,6 +69,7 @@ Interface::Interface(char* arg) {
 	// let user save changes/query database with 'enter' key
 	bind(".f1.e1", "<Return>", setID);
 	bind(".f1.e2", "<Return>", setName);
+	bind(".f1.e3", "<Return>", setEqID);
 
 	// add user
 	button(".f1.b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
@@ -179,8 +180,8 @@ void Interface::start() {
 	broadcast(networkAddress.c_str());
 }
 
-void Interface::startCheck(){
-	if (Database::getNumofPlayers() < 2){
+void Interface::startCheck() {
+	if (Database::getNumofPlayers() < 2) {
 		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Need at least 2 players to start.") -messagetype(ok);
 		return;
 	}
@@ -398,6 +399,22 @@ void Interface::setName() {
 		}
 	}
 	focus(".f1.e3");
+}
+
+void Interface::setEqID(){
+	int id;
+	try {
+		id = std::stoi(".f1.e3" << get());
+	} catch(const std::exception &e) {
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer for the Equipment ID.") -messagetype(ok);	
+		focus(".f1.e3");
+		return;
+	}
+	if (id&1){
+		addPlayer(Player::Team::RED);
+	}else {
+		addPlayer(Player::Team::GREEN);
+	}
 }
 
 // red helper function

@@ -14,6 +14,7 @@ class Interface {
 		static void showPlayActionScreen();
 		static void setID();
 		static void setName();
+		static void setEqID();
 		static void addRedPlayer();
 		static void addGreenPlayer();
 		static void addPlayer(Player::Team team);
