@@ -78,9 +78,9 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.b2") -column(2) -row(5) -pady(10);
 
 	// start game
-	button(".f1.b3") -text("Start") -command(this->start) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b3") -text("Start") -command(this->startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
-	bind(".", "<F5>", start);
+	bind(".", "<F5>", startCheck);
 	
 	// clear player buttons
 	button(".f1.b4") -text("Clear Red") -command(this->clearRedPlayers) -fg("white") -bg("#6b3333") -activebackground("#4b2222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
@@ -177,6 +177,15 @@ void Interface::start() {
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	std::string networkAddress = "127.0.0.1";
 	broadcast(networkAddress.c_str());
+}
+
+void Interface::startCheck(){
+	if (Database::getNumofPlayers() < 2){
+		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Need at least 2 players to start.") -messagetype(ok);
+		return;
+	}
+	start();
+		
 }
 
 void Interface::showPlayActionScreen() {

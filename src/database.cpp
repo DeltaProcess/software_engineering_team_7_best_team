@@ -141,3 +141,7 @@ void Database::clearPlayers(bool red, bool green) {
 	}
 }
 
+int Database::getNumofPlayers(){
+	return players.size();
+}
+
