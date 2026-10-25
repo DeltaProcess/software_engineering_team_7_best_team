@@ -19,6 +19,7 @@ class Database {
 		static std::map<int, Player> getPlayers(Player::Team team);
 		static bool friendlyFire(int eqID1, int eqID2);
 		static void clearPlayers(bool red, bool green);
+		static int getNumofPlayers();
 	private:
 		static pqxx::connection c;
 		static std::map<int, Player> players;

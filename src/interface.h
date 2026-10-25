@@ -22,6 +22,7 @@ class Interface {
 		static void clearAllPlayers();
 		static void clearPlayers(bool red, bool green);
 		static void refreshDisplay();
+		static void startCheck();
 	private:
 		static std::string tmp_img;
 };
