@@ -188,16 +188,16 @@ void Interface::showPlayActionScreen() {
         Database::getPlayers(Player::Team::GREEN);
 
     // Title
-    label(".paTitle")
-        -text("PLAYER ACTION")
-        -fg("white")
-        -bg("black");
-
-    grid(configure, ".paTitle")
-        -column(0)
-        -row(0)
-        -columnspan(2)
-        -pady(10);
+    // label(".paTitle")
+    //     -text("PLAYER ACTION")
+    //     -fg("white")
+    //     -bg("black"); 
+										// Didn't like how this label looked probably will delete later
+    // grid(configure, ".paTitle")
+    //     -column(0)
+    //     -row(0)
+    //     -columnspan(2)
+    //     -pady(10);
 
     // Team titles
     label(".paRedLabel")
