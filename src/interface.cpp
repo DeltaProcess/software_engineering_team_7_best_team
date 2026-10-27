@@ -161,7 +161,19 @@ void Interface::countdown() {
 		
 		destroy(".b");
 		images(deleteimg, "countdown");
+		
+		// recenter window
+		update();
+		int screen_width = std::stoi(winfo("screenwidth", "."));
+		int screen_height = std::stoi(winfo("screenheight", "."));
+		int window_width = std::stoi(winfo("reqwidth", "."));
+		int window_height = std::stoi(winfo("reqheight", "."));
+		int xpos = (screen_width - window_width) / 2;
+		int ypos = (screen_height - window_height) / 2;
+		wm(geometry, ".", std::to_string(window_width) + "x" + std::to_string(window_height) + "+" + std::to_string(xpos) + "+" + std::to_string(ypos));
 	}
+	
+	
 }
 
 void Interface::start() {
