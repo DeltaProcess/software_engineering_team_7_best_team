@@ -10,8 +10,6 @@ class Interface {
 		void splash();
 		static void importImage(std::string path, int size_x, int size_y);
 		static void countdown();
-		static void start();
-		static void showPlayActionScreen();
 		static void setID();
 		static void setName();
 		static void setEqID();
@@ -23,7 +21,9 @@ class Interface {
 		static void clearAllPlayers();
 		static void clearPlayers(bool red, bool green);
 		static void refreshDisplay();
+		static void start();
 		static void startCheck();
+		static void showPlayActionScreen();
 	private:
 		static std::string tmp_img;
 };
