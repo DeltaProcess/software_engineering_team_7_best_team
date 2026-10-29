@@ -7,10 +7,11 @@
 #define PORT 7500
 #define NETWORK_ADDRESS "127.0.0.1"
 
-int broadcast(const char* networkAddress) {
+int broadcast(const char* networkAddress, std::string message) {
     int sockfd;
     struct sockaddr_in broadcast_addr;
-    char broadcast_message[] = "202";
+    char* broadcast_message = new char[message.length()+1];
+    strcpy(broadcast_message, message.c_str());
 
     // Create a UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);

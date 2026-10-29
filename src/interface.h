@@ -26,6 +26,7 @@ class Interface {
 		static void showPlayActionScreen();
 	private:
 		static std::string tmp_img;
+		static std::string netaddr;
 };
 
 #endif

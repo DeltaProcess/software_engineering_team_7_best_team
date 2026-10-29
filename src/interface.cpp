@@ -16,6 +16,7 @@ using namespace Tk;
 using namespace cv;
 
 std::string Interface::tmp_img = "assets/images/tmp.png";
+std::string Interface::netaddr = "127.0.0.1";
 
 Interface::Interface(char* arg) {
 	init(arg);
@@ -215,7 +216,7 @@ void Interface::setEqID(){
 	int id;
 	try {
 		id = std::stoi(".f1.e3" << get());
-		broadcast(std::to_string(id).c_str());
+		broadcast(netaddr.c_str(), std::to_string(id).c_str());
 	} catch(const std::exception &e) {
 		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Enter a valid integer for the Equipment ID.") -messagetype(ok);	
 		focus(".f1.e3");
@@ -254,7 +255,7 @@ void Interface::addPlayer(Player::Team team) {
 	// check for valid equipment id, also includes even and odd checks
 	try {
 		eqID = std::stoi(".f1.e3" << get());
-		broadcast(std::to_string(eqID).c_str());
+		broadcast(netaddr.c_str(), std::to_string(eqID).c_str());
 		if ((eqID&1) != team) { 
 			if (team == Player::Team::RED) {
 				tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Even Equipment Numbers belong to the Green Team.") -messagetype(ok);
@@ -358,8 +359,8 @@ void Interface::start() {
 	std::thread rx(receive);
 	rx.detach();
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
-	std::string networkAddress = "127.0.0.1";
-	broadcast(networkAddress.c_str());
+	std::string message = "202";
+	broadcast(netaddr.c_str(), message);
 }
 
 void Interface::startCheck() {
