@@ -14,11 +14,12 @@ find_package(Threads REQUIRED)
 
 #set source (.c, .cc, .cpp) and header files
 file(GLOB CPPTK_SOURCE "lib/cpptk-1.0.2/*.cc" "lib/cpptk-1.0.2/base/*.cc")
+file(GLOB MINIAUDIO_SOURCE "lib/miniaudio-0.11.25/*.c" "lib/miniaudio-0.11.25/*.h")
 file(GLOB SOURCE_FILES "src/*.cpp" "src/udp/*.cpp")
 file(GLOB HEADER_FILES "src/*.h" "src/udp/*.h")
 
 #create main.exe
-add_executable(main ${SOURCE_FILES} ${HEADER_FILES} ${CPPTK_SOURCE})
+add_executable(main ${SOURCE_FILES} ${HEADER_FILES} ${CPPTK_SOURCE} ${MINIAUDIO_SOURCE})
 
 #link dependency headers
 target_include_directories(main PRIVATE 
@@ -29,4 +30,4 @@ target_include_directories(main PRIVATE
 )
 
 #link libraries
-target_link_libraries(main PRIVATE tcl tk pqxx ${OpenCV_LIBS} Threads::Threads)
+target_link_libraries(main PRIVATE dl tcl tk pqxx ${OpenCV_LIBS} Threads::Threads)
