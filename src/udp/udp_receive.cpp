@@ -65,8 +65,12 @@ int receive() {
                 std::cout << "Replied with: " << reply << std::endl;
             }
 
-            // friendly fire detection (will be ignored, for now, if the target is a base)
-            if ((target != 43) && (target != 53)) {
+            bool wasBaseHit = false;
+
+            // friendly fire detection (will be ignored if the target is a base)
+            if ((target == 43) || (target == 53)) {
+                wasBaseHit = true;
+            } else {
                 if (Database::friendlyFire(shooter, target)) {
                     snprintf(reply, sizeof(reply), "%d", shooter);
                     struct sockaddr_in reply_addr = client_addr;
@@ -80,7 +84,9 @@ int receive() {
                     }
                 }
             }
-			
+            
+            // Calls handleScoreEvent to let the database deal with updating the score(s) of the player(s) involved
+			Database::handleScoreEvent(shooter, target, wasBaseHit);
         }
     }
 

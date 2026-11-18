@@ -17,6 +17,7 @@ class Database {
 		static void editCodename(int id, std::string codename);
 		static int addPlayerToPlayers(int id, std::string codename, Player::Team team, int equipmentID);
 		static std::map<int, Player> getPlayers(Player::Team team);
+		static void handleScoreEvent(int eqID1, int eqID2, bool targetWasBase);
 		static bool friendlyFire(int eqID1, int eqID2);
 		static void clearPlayers(bool red, bool green);
 		static int getNumofPlayers();
