@@ -159,7 +159,7 @@ void Interface::countdown() {
 		button(".b") -image(images(create, photo, "countdown") -file(tmp_img));
 		pack(".b") -expand(true) -fill("both");
 		update();
-		//std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		destroy(".b");
 		images(deleteimg, "countdown");
@@ -357,7 +357,6 @@ void Interface::start() {
 	std::thread rx(receive);
 	rx.detach();
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
-	std::cout << "hi" << std::endl;
 	std::string message = "202";
 	broadcast(netaddr.c_str(), message);
 	
