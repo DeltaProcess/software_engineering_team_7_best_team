@@ -159,7 +159,7 @@ void Interface::countdown() {
 		button(".b") -image(images(create, photo, "countdown") -file(tmp_img));
 		pack(".b") -expand(true) -fill("both");
 		update();
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		//std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		destroy(".b");
 		images(deleteimg, "countdown");
@@ -352,16 +352,17 @@ void Interface::start() {
 	// displays countdown images
 	// destroys everything but root to allow for action screen
 	countdown();
-
-	// display player action screen after countdown finishes
-    showPlayActionScreen();
 	
 	// broadcast start
 	std::thread rx(receive);
 	rx.detach();
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	std::cout << "hi" << std::endl;
 	std::string message = "202";
 	broadcast(netaddr.c_str(), message);
+	
+	// display player action screen after countdown finishes
+    showPlayActionScreen();
 }
 
 void Interface::startCheck() {
@@ -449,7 +450,7 @@ void Interface::showPlayActionScreen() {
 }
 
 void Interface::timer() {
-	for (int i = 0; i < 361; i++) {
+	for (int i = 361; i > 0; i--) {
 		int min = i/60;
 		int sec = i%60;
 		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
