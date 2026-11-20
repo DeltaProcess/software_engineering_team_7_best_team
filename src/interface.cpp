@@ -20,7 +20,7 @@ std::string Interface::netaddr = "127.0.0.1";
 
 Interface::Interface(char* arg) {
 	init(arg);
-	
+
 	// formatted window title
 	wm("title", ".", "                Photon7");
 
@@ -144,6 +144,7 @@ void Interface::countdown() {
 
 	// create and destroy countdown elements
 	wm(geometry, ".", "=300x300");
+	"." << configure() -background("black");
 	for (int i = 31; i > -1; i--) {
 		std::string path = "assets/images/";
 		if (i == 31) {
@@ -173,6 +174,7 @@ void Interface::countdown() {
 		int ypos = (screen_height - window_height) / 2;
 		wm(geometry, ".", std::to_string(window_width) + "x" + std::to_string(window_height) + "+" + std::to_string(xpos) + "+" + std::to_string(ypos));
 	}
+	"." << configure() -background("gray");
 }
 
 void Interface::setID() {
@@ -320,7 +322,6 @@ void Interface::clearPlayers(bool red, bool green) {
 	focus(".f1.e1");
 }
 
-
 // refresh both teams displays
 void Interface::refreshDisplay() {
 	std::map<int,Player> rosterRed = Database::getPlayers(Player::Team::RED);
@@ -444,5 +445,16 @@ void Interface::showPlayActionScreen() {
     int ypos = (screen_height - window_height) / 2;
 
     wm(geometry, ".", std::to_string(window_width) + "x" + std::to_string(window_height) + "+" + std::to_string(xpos) + "+" + std::to_string(ypos));
+    timer();
 }
 
+void Interface::timer() {
+	for (int i = 0; i < 361; i++) {
+		int min = i/60;
+		int sec = i%60;
+		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
+		".paTimer" << configure() -text(timer);
+		update();
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+}
