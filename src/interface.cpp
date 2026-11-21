@@ -377,6 +377,10 @@ void Interface::showPlayActionScreen() {
     std::map<int, Player> rosterRed = Database::getPlayers(Player::Team::RED);
     std::map<int, Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
 
+	// Get each team's current score
+	int scoreRed = Database::getTeamScore(Player::Team::RED);
+	int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
+
     // Title
     // label(".paTitle") -text("PLAYER ACTION") -fg("white") -bg("black"); 
 	// Didn't like how this label looked probably will delete later
@@ -403,22 +407,22 @@ void Interface::showPlayActionScreen() {
     // Red players
     for (auto player : rosterRed) {
         Player p = player.second;
-        ".paRed" << insert("end", p.codename + "\t0\n");
+        ".paRed" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
     }
     ".paRed" << configure() -state("disabled");
 
     // Green players
     for (auto player : rosterGreen) {
         Player p = player.second;
-        ".paGreen" << insert("end", p.codename + "\t0\n");
+        ".paGreen" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
     }
     ".paGreen" << configure() -state("disabled");
 
     // Team scores
-    label(".paRedScore") -text("Red Team Score: 0") -fg("red") -bg("black");
+    label(".paRedScore") -text("Red Team Score: " + std::to_string(scoreRed)) -fg("red") -bg("black");
 	grid(configure, ".paRedScore") -column(0) -row(3) -pady(10);
 
-    label(".paGreenScore") -text("Green Team Score: 0") -fg("green") -bg("black");
+    label(".paGreenScore") -text("Green Team Score: " + std::to_string(scoreGreen)) -fg("green") -bg("black");
     grid(configure, ".paGreenScore") -column(1) -row(3) -pady(10);
 
     // Play-by-play area
@@ -448,12 +452,53 @@ void Interface::showPlayActionScreen() {
     timer();
 }
 
+void Interface::refreshScoreBoard() {
+	// Get players already entered for each team
+    std::map<int, Player> rosterRed = Database::getPlayers(Player::Team::RED);
+    std::map<int, Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
+
+	// Get each team's current score
+	int scoreRed = Database::getTeamScore(Player::Team::RED);
+	int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
+
+	// Temporarily reenable these textw() objects
+	".paRed" << configure() -state("normal");
+	".paGreen" << configure() -state("normal");
+
+	// Clear all text in these textw() objects
+	".paRed" << deletetext("1.0", "end");
+	".paGreen" << deletetext("1.0", "end");
+
+	// Headers
+    ".paRed" << insert("0.0", "Codename\tScore\n");
+    ".paGreen" << insert("0.0", "Codename\tScore\n");
+
+	 // Red players
+    for (auto player : rosterRed) {
+        Player p = player.second;
+        ".paRed" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    }
+    ".paRed" << configure() -state("disabled");
+
+    // Green players
+    for (auto player : rosterGreen) {
+        Player p = player.second;
+        ".paGreen" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    }
+    ".paGreen" << configure() -state("disabled");
+
+	// Refreshing the overall scores for the teams is (thankfully) much simpler
+	".paRedScore" << configure() -text("Red Team Score: " + std::to_string(scoreRed));
+	".paGreenScore" << configure() -text("Green Team Score: " + std::to_string(scoreGreen));
+}
+
 void Interface::timer() {
 	for (int i = 361; i > 0; i--) {
 		int min = i/60;
 		int sec = i%60;
 		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
 		".paTimer" << configure() -text(timer);
+		refreshScoreBoard();
 		update();
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}

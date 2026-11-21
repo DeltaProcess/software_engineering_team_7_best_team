@@ -24,6 +24,7 @@ class Interface {
 		static void start();
 		static void startCheck();
 		static void showPlayActionScreen();
+		static void refreshScoreBoard();
 		static void timer();
 	private:
 		static std::string tmp_img;
