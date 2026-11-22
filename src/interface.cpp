@@ -11,15 +11,27 @@
 #include <chrono>
 #include <thread>
 #include <map>
+#include <random>
 
 using namespace Tk;
 using namespace cv;
 
 std::string Interface::tmp_img = "assets/images/tmp.png";
 std::string Interface::netaddr = "127.0.0.1";
+Audio Interface::audio;
+
+// struct to hold onto each track's data
+struct Track
+{
+	std::string path;
+	int start_time;
+};
 
 Interface::Interface(char* arg) {
 	init(arg);
+	
+	// initialize audio
+	audio.init();
 
 	// formatted window title
 	wm("title", ".", "                Photon7");
@@ -134,13 +146,16 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 	ofs.close();
 }
 
-void Interface::countdown() {
+void Interface::countdown(const std::string & music_path, int music_offset) {
 	// destroy grid elements
 	destroy(".l1");
 	destroy(".l2");
 	destroy(".t1");
 	destroy(".t2");
 	destroy(".f1");
+	
+	// audio hasnt started yet
+	bool music_started = false;
 
 	// create and destroy countdown elements
 	wm(geometry, ".", "=300x300");
@@ -153,6 +168,13 @@ void Interface::countdown() {
 			path += "countdown";
 			path += std::to_string(i);
 			path += ".jpg";
+		}
+		
+		// do the music thing
+		if(!music_started && (31 - i) >= music_offset)
+		{
+			audio.play(music_path);
+			music_started = true;
 		}
 
 		importImage(path, 300, 300);
@@ -349,9 +371,26 @@ void Interface::refreshDisplay() {
 }
 
 void Interface::start() {
+	// track list
+	static const std::vector<Track> tracklist = {
+		{"assets/audio/tracks/Track01.mp3", 16},
+		{"assets/audio/tracks/Track02.mp3", 15},
+		{"assets/audio/tracks/Track03.mp3", 16},
+		{"assets/audio/tracks/Track04.mp3", 15},
+		{"assets/audio/tracks/Track05.mp3", 15},
+		{"assets/audio/tracks/Track06.mp3", 16},
+		{"assets/audio/tracks/Track07.mp3", 15},
+		{"assets/audio/tracks/Track08.mp3", 15}
+	};
+	
+	// random choice of audio
+	static std::mt19937 rng{std::random_device{}()};
+	std::uniform_int_distribution<size_t> pick(0, tracklist.size() - 1);
+	const Track & chosen_track = tracklist[pick(rng)];
+	
 	// displays countdown images
 	// destroys everything but root to allow for action screen
-	countdown();
+	countdown(chosen_track.path, chosen_track.start_time);
 	
 	// broadcast start
 	std::thread rx(receive);
