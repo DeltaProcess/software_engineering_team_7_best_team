@@ -26,6 +26,8 @@ class Interface {
 		static void startCheck();
 		static void showPlayActionScreen();
 		static void refreshScoreBoard();
+		static void addGameEvent(int shooter, int target);
+		static void refreshGameEvents();
 		static void timer();
 		static bool updateNetAddr();
 	private:

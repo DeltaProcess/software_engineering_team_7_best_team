@@ -12,6 +12,7 @@
 #include <thread>
 #include <map>
 #include <random>
+#include <mutex>
 
 using namespace Tk;
 using namespace cv;
@@ -19,6 +20,12 @@ using namespace cv;
 std::string Interface::tmp_img = "assets/images/tmp.png";
 std::string Interface::netaddr = "127.0.0.1";
 Audio Interface::audio;
+
+// Events received by the UDP thread wait here until the GUI refreshes them.
+namespace {
+    std::mutex gameEventMutex;
+    std::vector<std::pair<int, int>> pendingGameEvents;
+}
 
 // struct to hold onto each track's data
 struct Track
@@ -542,6 +549,128 @@ void Interface::refreshScoreBoard() {
 	".paGreenScore" << configure() -text("Green Team Score: " + std::to_string(scoreGreen));
 }
 
+void Interface::addGameEvent(int shooter, int target) {
+    // This function is called by the UDP receive thread.
+    // Store the event so the main GUI thread can display it safely.
+    std::lock_guard<std::mutex> lock(gameEventMutex);
+    pendingGameEvents.push_back({shooter, target});
+}
+
+
+void Interface::refreshGameEvents() {
+    // Take all pending events out of the queue.
+    std::vector<std::pair<int, int>> events;
+
+    {
+        std::lock_guard<std::mutex> lock(gameEventMutex);
+        events.swap(pendingGameEvents);
+    }
+
+    // Nothing new happened since the last refresh.
+    if (events.empty()) {
+        return;
+    }
+
+    // Get current players so equipment IDs can be changed
+    // into readable codenames.
+    std::map<int, Player> rosterRed =
+        Database::getPlayers(Player::Team::RED);
+
+    std::map<int, Player> rosterGreen =
+        Database::getPlayers(Player::Team::GREEN);
+
+    // Helper for finding a player by equipment ID.
+    auto findPlayer = [&](int equipmentID) -> const Player* {
+        auto redPlayer = rosterRed.find(equipmentID);
+
+        if (redPlayer != rosterRed.end()) {
+            return &redPlayer->second;
+        }
+
+        auto greenPlayer = rosterGreen.find(equipmentID);
+
+        if (greenPlayer != rosterGreen.end()) {
+            return &greenPlayer->second;
+        }
+
+        return nullptr;
+    };
+
+    // Temporarily enable the text box so we can add text.
+    ".paAction" << configure() -state("normal");
+
+    for (const auto& event : events) {
+        int shooterID = event.first;
+        int targetID = event.second;
+
+        const Player* shooter = findPlayer(shooterID);
+
+        std::string shooterName;
+
+        if (shooter != nullptr) {
+            shooterName = shooter->codename;
+        } else {
+            shooterName = "Equipment " + std::to_string(shooterID);
+        }
+
+        std::string eventText;
+
+        // Target 43 means the Green base was hit.
+        if (targetID == 43) {
+            eventText =
+                shooterName + " hit the Green Base! (+100)";
+        }
+
+        // Target 53 means the Red base was hit.
+        else if (targetID == 53) {
+            eventText =
+                shooterName + " hit the Red Base! (+100)";
+        }
+
+        // Normal player hit or friendly fire.
+        else {
+            const Player* target = findPlayer(targetID);
+
+            std::string targetName;
+
+            if (target != nullptr) {
+                targetName = target->codename;
+            } else {
+                targetName = "Equipment " + std::to_string(targetID);
+            }
+
+            // Same team = friendly fire.
+            if (shooter != nullptr &&
+                target != nullptr &&
+                shooter->team == target->team) {
+
+                eventText =
+                    "FRIENDLY FIRE: " +
+                    shooterName +
+                    " hit " +
+                    targetName;
+            }
+
+            // Players are on opposing teams.
+            else {
+                eventText =
+                    shooterName +
+                    " hit " +
+                    targetName;
+            }
+        }
+
+        // Add this event to the bottom of the action window.
+        ".paAction" << insert("end", eventText + "\n");
+    }
+
+    // Automatically keep the newest event visible.
+    ".paAction" << see("end");
+
+    // Prevent the user from manually editing the action log.
+    ".paAction" << configure() -state("disabled");
+}
+
 void Interface::timer() {
 	for (int i = 361; i > 0; i--) {
 		int min = i/60;
@@ -549,6 +678,7 @@ void Interface::timer() {
 		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
 		".paTimer" << configure() -text(timer);
 		refreshScoreBoard();
+		refreshGameEvents();
 		update();
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}

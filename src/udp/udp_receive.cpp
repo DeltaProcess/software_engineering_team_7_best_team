@@ -1,4 +1,5 @@
 #include "../database.h"
+#include "../interface.h"
 
 #include <iostream>
 
@@ -87,6 +88,9 @@ int receive() {
             
             // Calls handleScoreEvent to let the database deal with updating the score(s) of the player(s) involved
 			Database::handleScoreEvent(shooter, target, wasBaseHit);
+
+            // Send this event to the Player Action screen.
+            Interface::addGameEvent(shooter, target);
         }
     }
 
