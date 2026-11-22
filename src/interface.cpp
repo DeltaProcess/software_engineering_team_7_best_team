@@ -103,6 +103,17 @@ Interface::Interface(char* arg) {
 	
 	bind(".", "<F12>", clearAllPlayers);
 	
+	// change network address stuff
+	label(".f1.l4") -text("Network Address:");
+	grid(configure, ".f1.l4") -column(0) -row(7) -pady(10);
+	
+	entry(".f1.e4") -width(20) -highlightbackground("#0000fe") -highlightthickness(2);
+	grid(configure, ".f1.e4") -column(1) -row(7) -pady(10);
+	".f1.e4" << insert("0", netaddr);
+	
+	button(".f1.b7") -text("Change Address") -command(this->updateNetAddr) -fg("white") -bg("#aa65b5") -activebackground("#623869") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	grid(configure, ".f1.b7") -column(2) -row(7) -pady(10);
+	
 	// recenter window
 	update();
 	int screen_width = std::stoi(winfo("screenwidth", "."));
@@ -541,4 +552,11 @@ void Interface::timer() {
 		update();
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
+}
+
+bool Interface::updateNetAddr()
+{
+	std::string addr = ".f1.e4" << get();
+	netaddr = addr;
+	return true;
 }

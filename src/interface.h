@@ -27,6 +27,7 @@ class Interface {
 		static void showPlayActionScreen();
 		static void refreshScoreBoard();
 		static void timer();
+		static bool updateNetAddr();
 	private:
 		static std::string tmp_img;
 		static std::string netaddr;
