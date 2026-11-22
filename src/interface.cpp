@@ -434,6 +434,14 @@ void Interface::showPlayActionScreen() {
     std::map<int, Player> rosterRed = Database::getPlayers(Player::Team::RED);
     std::map<int, Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
 
+	// Load the base icon once for use beside players who hit a base
+	importImage("assets/images/baseicon.jpg", 24, 18);
+
+	// Delete an old copy if another game was previously played
+	eval("catch {image delete baseIcon}");
+
+	images(create, photo, "baseIcon") -file(tmp_img);
+
 	// Get each team's current score
 	int scoreRed = Database::getTeamScore(Player::Team::RED);
 	int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
@@ -463,16 +471,36 @@ void Interface::showPlayActionScreen() {
 
     // Red players
     for (auto player : rosterRed) {
-        Player p = player.second;
-        ".paRed" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    Player p = player.second;
+
+    // Put base icon to the left of the codename
+    // if this player has hit a base.
+    if (p.hasHitBase) {
+        eval(".paRed image create end -image baseIcon");
+        ".paRed" << insert("end", " ");
     }
+
+    ".paRed" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paRed" << configure() -state("disabled");
 
     // Green players
     for (auto player : rosterGreen) {
-        Player p = player.second;
-        ".paGreen" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    Player p = player.second;
+
+    if (p.hasHitBase) {
+        eval(".paGreen image create end -image baseIcon");
+        ".paGreen" << insert("end", " ");
     }
+
+    ".paGreen" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paGreen" << configure() -state("disabled");
 
     // Team scores
@@ -532,16 +560,34 @@ void Interface::refreshScoreBoard() {
 
 	 // Red players
     for (auto player : rosterRed) {
-        Player p = player.second;
-        ".paRed" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    Player p = player.second;
+
+    if (p.hasHitBase) {
+        eval(".paRed image create end -image baseIcon");
+        ".paRed" << insert("end", " ");
     }
+
+    ".paRed" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paRed" << configure() -state("disabled");
 
     // Green players
     for (auto player : rosterGreen) {
-        Player p = player.second;
-        ".paGreen" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    Player p = player.second;
+
+    if (p.hasHitBase) {
+        eval(".paGreen image create end -image baseIcon");
+        ".paGreen" << insert("end", " ");
     }
+
+    ".paGreen" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paGreen" << configure() -state("disabled");
 
 	// Refreshing the overall scores for the teams is (thankfully) much simpler
