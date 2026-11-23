@@ -507,6 +507,9 @@ void Interface::refreshScoreBoard() {
     std::map<int, Player> rosterRed = Database::getPlayers(Player::Team::RED);
     std::map<int, Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
 
+	std::vector<std::pair<std::string, int>> teamRed = sortPlayers(rosterRed); 
+	std::vector<std::pair<std::string, int>> teamGreen = sortPlayers(rosterGreen); 
+
 	// Get each team's current score
 	int scoreRed = Database::getTeamScore(Player::Team::RED);
 	int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
@@ -524,16 +527,14 @@ void Interface::refreshScoreBoard() {
     ".paGreen" << insert("0.0", "Codename\tScore\n");
 
 	 // Red players
-    for (auto player : rosterRed) {
-        Player p = player.second;
-        ".paRed" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    for (auto p : teamRed) {
+        ".paRed" << insert("end", p.first + "\t" + std::to_string(p.second) + "\n");
     }
     ".paRed" << configure() -state("disabled");
 
     // Green players
-    for (auto player : rosterGreen) {
-        Player p = player.second;
-        ".paGreen" << insert("end", p.codename + "\t" + std::to_string(p.score) + "\n");
+    for (auto p : teamGreen) {
+        ".paGreen" << insert("end", p.first + "\t" + std::to_string(p.second) + "\n");
     }
     ".paGreen" << configure() -state("disabled");
 
@@ -560,3 +561,25 @@ bool Interface::updateNetAddr()
 	netaddr = addr;
 	return true;
 }
+
+std::vector<std::pair<std::string, int>> Interface::sortPlayers(std::map<int, Player> playerTeam){
+	std::vector<std::pair<std::string, int>> sortingTeam;
+	for (auto player : playerTeam) {
+        Player p = player.second;
+        sortingTeam.push_back({p.codename, p.score});
+    }
+    for (int m = 0; m < sortingTeam.size(); m++){
+		bool swap = false;
+		for (int h = 0; h < sortingTeam.size()- m; h++){
+			if (sortingTeam[h].second < sortingTeam[h+1].second){
+				std::swap(sortingTeam[h], sortingTeam[h+1]);
+				swap = true;
+			}
+		}
+		if (!swap){
+			break;
+		}
+	}
+	return sortingTeam;
+}
+

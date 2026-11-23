@@ -134,11 +134,9 @@ int Database::getTeamScore(Player::Team team) {
 // udp_broadcast lets Database know what happened, then Database handles scoring accordingly 
 void Database::handleScoreEvent(int eqID1, int eqID2, bool targetWasBase) {
 	// if the bool is true, then eqID2 becomes irrelivant to this function and won't be able to cause issues
-	if (targetWasBase) {
+	if (targetWasBase && !players.at(eqID1).hasHitBase) {
 		players.at(eqID1).score += 100;
 		players.at(eqID1).hasHitBase = true;
-		// DEBUG: displays eqID1's score after it gets updated
-		//std::cout << "DEBUG: The shooting player with the hardware ID of " << eqID1 << "\'s score is now: " << players.at(eqID1).score << std::endl;
 	} else if (friendlyFire(eqID1, eqID2)) {
 		// Does not allow for the shooter's points to be deducted to negative values
 		if (players.at(eqID1).score >= 10) {
@@ -146,21 +144,6 @@ void Database::handleScoreEvent(int eqID1, int eqID2, bool targetWasBase) {
 		} else {
 			players.at(eqID1).score = 0;
 		}
-		// DEBUG: displays eqID1's score after it gets updated
-		//std::cout << "DEBUG: The shooting player with the hardware ID of " << eqID1 << "\'s score is now: " << players.at(eqID1).score << std::endl;
-
-		// Does not allow for the target's points to be deducted to negative values
-		if (players.at(eqID2).score >= 10) {
-			players.at(eqID2).score = players.at(eqID2).score - 10;
-		} else {
-			players.at(eqID2).score = 0;
-		}
-		// DEBUG: displays eqID2's score after it gets updated
-		//std::cout << "DEBUG: The targeted player with the hardware ID of " << eqID2 << "\'s score is now: " << players.at(eqID2).score << std::endl;
-	} else {
-		players.at(eqID1).score += 10;
-		// DEBUG: displays eqID1's score after it gets updated
-		//std::cout << "DEBUG: The shooting player with the hardware ID of " << eqID1 << "\'s score is now: " << players.at(eqID1).score << std::endl;
 		
 		// Does not allow for the target's points to be deducted to negative values
 		if (players.at(eqID2).score >= 10) {
@@ -168,8 +151,16 @@ void Database::handleScoreEvent(int eqID1, int eqID2, bool targetWasBase) {
 		} else {
 			players.at(eqID2).score = 0;
 		}
-		// DEBUG: displays eqID2's score after it gets updated
-		//std::cout << "DEBUG: The targeted player with the hardware ID of " << eqID2 << "\'s score is now: " << players.at(eqID2).score << std::endl;
+		
+		
+	} else {
+		players.at(eqID1).score += 10;
+		// Does not allow for the target's points to be deducted to negative values
+		if (players.at(eqID2).score >= 10) {
+			players.at(eqID2).score = players.at(eqID2).score - 10;
+		} else {
+			players.at(eqID2).score = 0;
+		}
 	}
 }
 
