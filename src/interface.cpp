@@ -507,6 +507,7 @@ void Interface::refreshScoreBoard() {
     std::map<int, Player> rosterRed = Database::getPlayers(Player::Team::RED);
     std::map<int, Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
 
+	// get the sorted by scores lists
 	std::vector<std::pair<std::string, int>> teamRed = sortPlayers(rosterRed); 
 	std::vector<std::pair<std::string, int>> teamGreen = sortPlayers(rosterGreen); 
 
@@ -544,7 +545,7 @@ void Interface::refreshScoreBoard() {
 }
 
 void Interface::timer() {
-	for (int i = 361; i > 0; i--) {
+	for (int i = 361; i >= 0; i--) {
 		int min = i/60;
 		int sec = i%60;
 		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
@@ -553,6 +554,10 @@ void Interface::timer() {
 		update();
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
+	// broadcasts 221 three times
+	broadcast(netaddr.c_str(), "221");
+	broadcast(netaddr.c_str(), "221");
+	broadcast(netaddr.c_str(), "221");
 }
 
 bool Interface::updateNetAddr()
@@ -562,15 +567,16 @@ bool Interface::updateNetAddr()
 	return true;
 }
 
+// sorts players by score to display from highest to lowest
 std::vector<std::pair<std::string, int>> Interface::sortPlayers(std::map<int, Player> playerTeam){
 	std::vector<std::pair<std::string, int>> sortingTeam;
-	for (auto player : playerTeam) {
+	for (auto player : playerTeam) { // copies map to vector
         Player p = player.second;
         sortingTeam.push_back({p.codename, p.score});
     }
     for (int m = 0; m < sortingTeam.size(); m++){
 		bool swap = false;
-		for (int h = 0; h < sortingTeam.size()- m; h++){
+		for (int h = 0; (h + 1)< sortingTeam.size()- m; h++){
 			if (sortingTeam[h].second < sortingTeam[h+1].second){
 				std::swap(sortingTeam[h], sortingTeam[h+1]);
 				swap = true;
