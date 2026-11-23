@@ -30,7 +30,7 @@ class Interface {
 		static void refreshGameEvents();
 		static void timer();
 		static bool updateNetAddr();
-		static std::vector<std::pair<std::string, int>> sortPlayers(std::map<int, Player> playerTeam);
+		static std::vector<std::tuple<std::string, int, bool>> sortPlayers(std::map<int, Player> playerTeam);
 	private:
 		static std::string tmp_img;
 		static std::string netaddr;

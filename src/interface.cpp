@@ -21,6 +21,7 @@ std::string Interface::tmp_img = "assets/images/tmp.png";
 std::string Interface::netaddr = "127.0.0.1";
 Audio Interface::audio;
 
+
 // Events received by the UDP thread wait here until the GUI refreshes them.
 namespace {
     std::mutex gameEventMutex;
@@ -36,44 +37,42 @@ struct Track
 
 Interface::Interface(char* arg) {
 	init(arg);
-	
-	// initialize audio
 	audio.init();
 
-	// formatted window title
+	// Formatted window title
 	wm("title", ".", "                Photon7");
 
 	splash();
 
-	// red and green team labels
-	label(".l1") -width(40) -text("Red Team") -fg("red") -bg("black");
-	label(".l2") -width(40) -text("Green Team") -fg("green") -bg("black");
+	// Red and green team labels
+	label(".l1") -width(80) -text("Red Team") -fg("red") -bg("black");
+	label(".l2") -width(80) -text("Green Team") -fg("green") -bg("black");
 	grid(configure, ".l1") -column(0) -row(0);
 	grid(configure, ".l2") -column(1) -row(0);
 
-	// red and green team text display
-	textw(".t1") -width(40) -height(20) -fg("white") -bg("#4d0000") -tabs("60 240") -highlightbackground("#0000fe") -highlightthickness(2);
-	textw(".t2") -width(40) -height(20) -fg("white") -bg("#004d00") -tabs("60 240") -highlightbackground("#0000fe") -highlightthickness(2);
+	// Red and green team text display
+	textw(".t1") -width(80) -height(20) -fg("white") -bg("#4d0000") -tabs("60 240") -highlightbackground("#0000fe") -highlightthickness(2);
+	textw(".t2") -width(80) -height(20) -fg("white") -bg("#004d00") -tabs("60 240") -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".t1") -column(0) -row(1);
 	grid(configure, ".t2") -column(1) -row(1);
-	".t1" << insert("0.0", "ID\tCodename\tEquipment\n");
-	".t2" << insert("0.0", "ID\tCodename\tEquipment\n");
+	".t1" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
+	".t2" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
 	".t1" << configure() -state("disabled");
 	".t2" << configure() -state("disabled");
 
-	// everything below the two team boxes
+	// Everything below the two team boxes
 	frame(".f1");
 	grid(configure, ".f1") -column(0) -row(3) -pady(10) -columnspan(2);
 
-	// entry text box labels
+	// Entry text box labels
 	label(".f1.l1") -text("ID");
 	label(".f1.l2") -text("Codename");
 	label(".f1.l3") -text("Equipment ID");
 	grid(configure, ".f1.l1") -column(0) -row(3);
-	grid(configure, ".f1.l2") -column(1) -row(3);
+	grid(configure, ".f1.l2") -column(1) -row(3) -padx(200);
 	grid(configure, ".f1.l3") -column(2) -row(3);
 
-	// team entries
+	// Team entries
 	entry(".f1.e1") -width(20) -invalidcommand("bell") -highlightbackground("#0000fe") -highlightthickness(2);
 	entry(".f1.e2") -width(20) -invalidcommand("bell") -highlightbackground("#0000fe") -highlightthickness(2);
 	entry(".f1.e3") -width(20) -invalidcommand("bell") -highlightbackground("#0000fe") -highlightthickness(2);
@@ -81,36 +80,36 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.e2") -column(1) -row(4) -padx(10);
 	grid(configure, ".f1.e3") -column(2) -row(4) -padx(10);
 
-	// let user save changes/query database with 'enter' key
+	// Let user save changes/query database with 'enter' key
 	bind(".f1.e1", "<Return>", setID);
 	bind(".f1.e2", "<Return>", setName);
 	bind(".f1.e3", "<Return>", setEqID);
 
-	// add user
+	// Add user
 	button(".f1.b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b1") -column(0) -row(5) -pady(10);
 
 	button(".f1.b2") -text("Add to Green") -command(this->addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b2") -column(2) -row(5) -pady(10);
 
-	// start game
-	button(".f1.b3") -text("Start (F5)") -command(this->startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	// Start game
+	button(".f1.b3") -text("Start") -command(this->startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
 	bind(".", "<F5>", startCheck);
 	
-	// clear player buttons
+	// Clear player buttons
 	button(".f1.b4") -text("Clear Red") -command(this->clearRedPlayers) -fg("white") -bg("#6b3333") -activebackground("#4b2222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b4") -column(0) -row(6) -pady(10);
 	
 	button(".f1.b5") -text("Clear Green") -command(this->clearGreenPlayers) -fg("white") -bg("#336b33") -activebackground("#224b22") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b5") -column(2) -row(6) -pady(10);
 	
-	button(".f1.b6") -text("Clear All (F12)") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b6") -text("Clear All") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b6") -column(1) -row(6) -pady(10);
 	
 	bind(".", "<F12>", clearAllPlayers);
 	
-	// change network address stuff
+	// Change network address
 	label(".f1.l4") -text("Network Address:");
 	grid(configure, ".f1.l4") -column(0) -row(7) -pady(10);
 	
@@ -121,7 +120,7 @@ Interface::Interface(char* arg) {
 	button(".f1.b7") -text("Change Address") -command(this->updateNetAddr) -fg("white") -bg("#aa65b5") -activebackground("#623869") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b7") -column(2) -row(7) -pady(10);
 	
-	// recenter window
+	// Recenter window
 	update();
 	int screen_width = std::stoi(winfo("screenwidth", "."));
 	int screen_height = std::stoi(winfo("screenheight", "."));
@@ -134,7 +133,7 @@ Interface::Interface(char* arg) {
 	runEventLoop();
 }
 
-// display splash screen
+// Display splash screen
 void Interface::splash() {
 	importImage("assets/images/logo.jpg", 300, 300);
 	button(".b") -image(images(create, photo, "logo") -file(tmp_img));
@@ -146,10 +145,9 @@ void Interface::splash() {
 	images(deleteimg, "logo");
 }
 
-// autoimporter for .jpg images
+// Autoimporter for .jpg images
 //
-// use: you have to importImage(path, width, height)
-// BEFORE the -file() option
+// Use: run importImage(path, width, height) BEFORE -file() option
 void Interface::importImage(std::string path, int size_x, int size_y) {
 	Mat src = imread(path);
 	Mat dst;
@@ -165,17 +163,16 @@ void Interface::importImage(std::string path, int size_x, int size_y) {
 }
 
 void Interface::countdown(const std::string & music_path, int music_offset) {
-	// destroy grid elements
+	// Destroy grid elements
 	destroy(".l1");
 	destroy(".l2");
 	destroy(".t1");
 	destroy(".t2");
 	destroy(".f1");
 	
-	// audio hasnt started yet
 	bool music_started = false;
 
-	// create and destroy countdown elements
+	// Create and destroy countdown elements
 	wm(geometry, ".", "=300x300");
 	"." << configure() -background("black");
 	for (int i = 31; i > -1; i--) {
@@ -188,7 +185,7 @@ void Interface::countdown(const std::string & music_path, int music_offset) {
 			path += ".jpg";
 		}
 		
-		// do the music thing
+		// Play music
 		if(!music_started && (31 - i) >= music_offset)
 		{
 			audio.play(music_path);
@@ -204,7 +201,7 @@ void Interface::countdown(const std::string & music_path, int music_offset) {
 		destroy(".b");
 		images(deleteimg, "countdown");
 
-		// recenter window
+		// Recenter window
 		update();
 		int screen_width = std::stoi(winfo("screenwidth", "."));
 		int screen_height = std::stoi(winfo("screenheight", "."));
@@ -228,7 +225,7 @@ void Interface::setID() {
 	if (Database::searchID(id) != "") {
 		".f1.e2" << deletetext("0", end);
 		".f1.e2" << insert("0", Database::searchID(id));
-		// focus on equipment text box if codename is found
+		// Focus on equipment text box if codename is found
 		focus(".f1.e3");
 	} else {
 		focus(".f1.e2");
@@ -271,12 +268,12 @@ void Interface::setEqID(){
 	}
 }
 
-// red helper function
+// Red helper function
 void Interface::addRedPlayer() {
 	addPlayer(Player::Team::RED);
 }
 
-// green helper function
+// Green helper function
 void Interface::addGreenPlayer() {
 	addPlayer(Player::Team::GREEN);
 }
@@ -285,7 +282,7 @@ void Interface::addPlayer(Player::Team team) {
 	int id;
 	int eqID;
 
-	// check for valid id
+	// Check for valid id
 	try {
 		id = std::stoi(".f1.e1" << get());
 	} catch(const std::exception &e) {
@@ -294,7 +291,7 @@ void Interface::addPlayer(Player::Team team) {
 		return;
 	}
 
-	// check for valid equipment id, also includes even and odd checks
+	// Check for valid equipment id, also includes even and odd checks
 	try {
 		eqID = std::stoi(".f1.e3" << get());
 		broadcast(netaddr.c_str(), std::to_string(eqID).c_str());
@@ -319,7 +316,7 @@ void Interface::addPlayer(Player::Team team) {
 		return;
 	}
 
-	// status will show a dialog box with the corresponding error and will focus on what box has it
+	// Status will show a dialog box with the corresponding error and will focus on what box has it
 	int status = Database::addPlayerToPlayers(id, codename, team, eqID);
 	if (status == 1) {
 		tk_messageBox() -defaultbutton("ok") -icon("error") -messagetext("Current ID and Codename does not match database. Please hit enter in the codename box.") -messagetype(ok);
@@ -362,34 +359,34 @@ void Interface::clearPlayers(bool red, bool green) {
 	focus(".f1.e1");
 }
 
-// refresh both teams displays
+// Refresh team displays
 void Interface::refreshDisplay() {
 	std::map<int,Player> rosterRed = Database::getPlayers(Player::Team::RED);
 	std::map<int,Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
 
 	".t1" << configure() -state("normal");
 	".t1" << deletetext("1.0", end);
-	".t1" << insert("0.0", "ID\tCodename\tEquipment\n");
+	".t1" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
 	for (auto player: rosterRed) {
 		int eqID = player.first;
 		Player p = player.second;
-		 ".t1"  << insert("end", std::to_string(p.id) + "\t" + p.codename + "\t"+ std::to_string(eqID) + "\n");
+		 ".t1"  << insert("end", std::to_string(p.id) + "\t\t      " + p.codename + "\t                  "+ std::to_string(eqID) + "\n");
 	}
 	".t1" << configure() -state("disabled");
 
 	".t2" << configure() -state("normal");
 	".t2" << deletetext("1.0", end);
-	".t2" << insert("0.0", "ID\tCodename\tEquipment\n");
+	".t2" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
 	for (auto player: rosterGreen) {
 		int eqID = player.first;
 		Player p = player.second;
-		 ".t2" << insert("end", std::to_string(p.id) + "\t" + p.codename + "\t"+ std::to_string(eqID) + "\n");
+		 ".t2" << insert("end", std::to_string(p.id) + "\t\t      " + p.codename + "\t                  "+ std::to_string(eqID) + "\n");
 	}
 	".t2" << configure() -state("disabled");
 }
 
 void Interface::start() {
-	// track list
+	// Track list
 	static const std::vector<Track> tracklist = {
 		{"assets/audio/tracks/Track01.mp3", 16},
 		{"assets/audio/tracks/Track02.mp3", 15},
@@ -401,23 +398,23 @@ void Interface::start() {
 		{"assets/audio/tracks/Track08.mp3", 15}
 	};
 	
-	// random choice of audio
+	// Randomly select audio
 	static std::mt19937 rng{std::random_device{}()};
 	std::uniform_int_distribution<size_t> pick(0, tracklist.size() - 1);
 	const Track & chosen_track = tracklist[pick(rng)];
 	
-	// displays countdown images
-	// destroys everything but root to allow for action screen
+	// Displays countdown images
+	// Destroy everything but root for play action screen
 	countdown(chosen_track.path, chosen_track.start_time);
 	
-	// broadcast start
+	// Croadcast start
 	std::thread rx(receive);
 	rx.detach();
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	std::string message = "202";
 	broadcast(netaddr.c_str(), message);
 	
-	// display player action screen after countdown finishes
+	// Display player action screen after countdown finishes
     showPlayActionScreen();
 }
 
@@ -446,11 +443,6 @@ void Interface::showPlayActionScreen() {
 	int scoreRed = Database::getTeamScore(Player::Team::RED);
 	int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
 
-    // Title
-    // label(".paTitle") -text("PLAYER ACTION") -fg("white") -bg("black"); 
-	// Didn't like how this label looked probably will delete later
-    // grid(configure, ".paTitle") -column(0) -row(0) -columnspan(2) -pady(10);
-
     // Titles
     label(".paRedLabel") -width(40) -text("RED TEAM") -fg("red") -bg("black");
 	grid(configure, ".paRedLabel") -column(0) -row(1);
@@ -459,48 +451,39 @@ void Interface::showPlayActionScreen() {
 	grid(configure, ".paGreenLabel") -column(1) -row(1);
 
     // Player displays
-    textw(".paRed") -width(40) -height(10) -fg("white") -bg("#4d0000") -tabs("200") -highlightbackground("#0000fe") -highlightthickness(2);
+    textw(".paRed") -width(80) -height(20) -fg("white") -bg("#4d0000") -tabs("200") -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".paRed") -column(0) -row(2);
 
-    textw(".paGreen") -width(40) -height(10) -fg("white") -bg("#004d00") -tabs("200") -highlightbackground("#0000fe") -highlightthickness(2);
+    textw(".paGreen") -width(80) -height(20) -fg("white") -bg("#004d00") -tabs("200") -highlightbackground("#0000fe") -highlightthickness(2);
     grid(configure, ".paGreen") -column(1) -row(2);
 
     // Headers
-    ".paRed" << insert("0.0", "Codename\tScore\n");
-    ".paGreen" << insert("0.0", "Codename\tScore\n");
+    ".paRed" << insert("0.0", "Codename\t\t                          Score\n");
+    ".paGreen" << insert("0.0", "Codename\t\t                          Score\n");
 
     // Red players
     for (auto player : rosterRed) {
-    Player p = player.second;
-
-    // Put base icon to the left of the codename
-    // if this player has hit a base.
-    if (p.hasHitBase) {
-        eval(".paRed image create end -image baseIcon");
-        ".paRed" << insert("end", " ");
-    }
-
-    ".paRed" << insert(
-        "end",
-        p.codename + "\t" + std::to_string(p.score) + "\n"
-    );
-}
+        Player p = player.second;
+		// Put base icon to the left of the codename
+		// if this player has hit a base.
+		if (p.hasHitBase) {
+			eval(".paRed image create end -image baseIcon");
+			".paRed" << insert("end", " ");
+		}
+		".paRed" << insert("end", p.codename + "\t\t                          " + std::to_string(p.score) + "\n");
+	}
     ".paRed" << configure() -state("disabled");
 
     // Green players
     for (auto player : rosterGreen) {
-    Player p = player.second;
-
-    if (p.hasHitBase) {
-        eval(".paGreen image create end -image baseIcon");
-        ".paGreen" << insert("end", " ");
-    }
-
-    ".paGreen" << insert(
-        "end",
-        p.codename + "\t" + std::to_string(p.score) + "\n"
-    );
-}
+        Player p = player.second;
+ 
+		if (p.hasHitBase) {
+			eval(".paGreen image create end -image baseIcon");
+			".paGreen" << insert("end", " ");
+		}
+        ".paGreen" << insert("end", p.codename + "\t\t                          " + std::to_string(p.score) + "\n");
+	}
     ".paGreen" << configure() -state("disabled");
 
     // Team scores
@@ -550,40 +533,40 @@ void Interface::refreshScoreBoard() {
 	int scoreRed = Database::getTeamScore(Player::Team::RED);
 	int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
 
-	// Temporarily reenable these textw() objects
+	// Temporarily reenable labels
 	".paRed" << configure() -state("normal");
 	".paGreen" << configure() -state("normal");
 
-	// Clear all text in these textw() objects
+	// Clear text in labels
 	".paRed" << deletetext("1.0", "end");
 	".paGreen" << deletetext("1.0", "end");
 
 	// Headers
-    ".paRed" << insert("0.0", "Codename\tScore\n");
-    ".paGreen" << insert("0.0", "Codename\tScore\n");
+    ".paRed" << insert("0.0", "Codename\t\t                        Score\n");
+    ".paGreen" << insert("0.0", "Codename\t\t                        Score\n");
 
 	 // Red players
     for (auto p : teamRed) {
-		if (p.third) {
+		if (std::get<2>(p)) {
 			eval(".paRed image create end -image baseIcon");
 			".paRed" << insert("end", " ");
 		}	
-        ".paRed" << insert("end", p.first + "\t" + std::to_string(p.second) + "\n");
+        ".paRed" << insert("end", std::get<0>(p) + "\t\t                        " + std::to_string(std::get<1>(p)) + "\n");
    }
     ".paRed" << configure() -state("disabled");
 
     // Green players
     for (auto p : teamGreen) {
-		if (p.hasHitBase) {
+		if (std::get<2>(p)) {
 			eval(".paGreen image create end -image baseIcon");
 			".paGreen" << insert("end", " ");
 		}
-
-        ".paGreen" << insert("end", p.first + "\t" + std::to_string(p.second) + "\n");
+		 ".paGreen" << insert("end", std::get<0>(p) + "\t\t                        " + std::to_string(std::get<1>(p)) + "\n");
 	}
+	
     ".paGreen" << configure() -state("disabled");
 
-	// Refreshing the overall scores for the teams is (thankfully) much simpler
+	// Refresh scores
 	".paRedScore" << configure() -text("Red Team Score: " + std::to_string(scoreRed));
 	".paGreenScore" << configure() -text("Green Team Score: " + std::to_string(scoreGreen));
 }
@@ -716,6 +699,17 @@ void Interface::timer() {
 		int sec = i%60;
 		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
 		".paTimer" << configure() -text(timer);
+		
+		int scoreRed = Database::getTeamScore(Player::Team::RED);
+		int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
+		if(scoreRed > scoreGreen) {
+			".paGreenScore" << configure() -foreground("white");
+			".paRedScore" << configure() -foreground((i%2==0)?"red":"white");
+		} else {
+			".paRedScore" << configure() -foreground("white");
+			".paGreenScore" << configure() -foreground((i%2==0)?"green":"white");
+		}
+		
 		refreshScoreBoard();
 		refreshGameEvents();
 		update();
@@ -744,7 +738,7 @@ std::vector<std::tuple<std::string, int, bool>> Interface::sortPlayers(std::map<
     for (int m = 0; m < sortingTeam.size(); m++){
 		bool swap = false;
 		for (int h = 0; (h + 1)< sortingTeam.size()- m; h++){
-			if (sortingTeam[h].second < sortingTeam[h+1].second){
+			if (std::get<1>(sortingTeam[h]) < std::get<1>(sortingTeam[h+1])){
 				std::swap(sortingTeam[h], sortingTeam[h+1]);
 				swap = true;
 			}
