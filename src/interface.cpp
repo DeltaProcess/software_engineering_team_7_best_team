@@ -12,6 +12,7 @@
 #include <thread>
 #include <map>
 #include <random>
+#include <mutex>
 
 using namespace Tk;
 using namespace cv;
@@ -20,7 +21,17 @@ std::string Interface::tmp_img = "assets/images/tmp.png";
 std::string Interface::netaddr = "127.0.0.1";
 Audio Interface::audio;
 
+<<<<<<< HEAD
 // Struct containing individual track data
+=======
+// Events received by the UDP thread wait here until the GUI refreshes them.
+namespace {
+    std::mutex gameEventMutex;
+    std::vector<std::pair<int, int>> pendingGameEvents;
+}
+
+// struct to hold onto each track's data
+>>>>>>> c528bf4f63913a1006a257995fdcd000855e25dc
 struct Track
 {
 	std::string path;
@@ -423,6 +434,14 @@ void Interface::showPlayActionScreen() {
     std::map<int, Player> rosterRed = Database::getPlayers(Player::Team::RED);
     std::map<int, Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
 
+	// Load the base icon once for use beside players who hit a base
+	importImage("assets/images/baseicon.jpg", 24, 18);
+
+	// Delete an old copy if another game was previously played
+	eval("catch {image delete baseIcon}");
+
+	images(create, photo, "baseIcon") -file(tmp_img);
+
 	// Get each team's current score
 	int scoreRed = Database::getTeamScore(Player::Team::RED);
 	int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
@@ -447,16 +466,46 @@ void Interface::showPlayActionScreen() {
 
     // Red players
     for (auto player : rosterRed) {
+<<<<<<< HEAD
         Player p = player.second;
         ".paRed" << insert("end", p.codename + "\t\t                          " + std::to_string(p.score) + "\n");
+=======
+    Player p = player.second;
+
+    // Put base icon to the left of the codename
+    // if this player has hit a base.
+    if (p.hasHitBase) {
+        eval(".paRed image create end -image baseIcon");
+        ".paRed" << insert("end", " ");
+>>>>>>> c528bf4f63913a1006a257995fdcd000855e25dc
     }
+
+    ".paRed" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paRed" << configure() -state("disabled");
 
     // Green players
     for (auto player : rosterGreen) {
+<<<<<<< HEAD
         Player p = player.second;
         ".paGreen" << insert("end", p.codename + "\t\t                          " + std::to_string(p.score) + "\n");
+=======
+    Player p = player.second;
+
+    if (p.hasHitBase) {
+        eval(".paGreen image create end -image baseIcon");
+        ".paGreen" << insert("end", " ");
+>>>>>>> c528bf4f63913a1006a257995fdcd000855e25dc
     }
+
+    ".paGreen" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paGreen" << configure() -state("disabled");
 
     // Team scores
@@ -516,21 +565,171 @@ void Interface::refreshScoreBoard() {
 
 	 // Red players
     for (auto player : rosterRed) {
+<<<<<<< HEAD
         Player p = player.second;
         ".paRed" << insert("end", p.codename + "\t\t                        " + std::to_string(p.score) + "\n");
+=======
+    Player p = player.second;
+
+    if (p.hasHitBase) {
+        eval(".paRed image create end -image baseIcon");
+        ".paRed" << insert("end", " ");
+>>>>>>> c528bf4f63913a1006a257995fdcd000855e25dc
     }
+
+    ".paRed" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paRed" << configure() -state("disabled");
 
     // Green players
     for (auto player : rosterGreen) {
+<<<<<<< HEAD
         Player p = player.second;
         ".paGreen" << insert("end", p.codename + "\t\t                        " + std::to_string(p.score) + "\n");
+=======
+    Player p = player.second;
+
+    if (p.hasHitBase) {
+        eval(".paGreen image create end -image baseIcon");
+        ".paGreen" << insert("end", " ");
+>>>>>>> c528bf4f63913a1006a257995fdcd000855e25dc
     }
+
+    ".paGreen" << insert(
+        "end",
+        p.codename + "\t" + std::to_string(p.score) + "\n"
+    );
+}
     ".paGreen" << configure() -state("disabled");
 
 	// Refresh scores
 	".paRedScore" << configure() -text("Red Team Score: " + std::to_string(scoreRed));
 	".paGreenScore" << configure() -text("Green Team Score: " + std::to_string(scoreGreen));
+}
+
+void Interface::addGameEvent(int shooter, int target) {
+    // This function is called by the UDP receive thread.
+    // Store the event so the main GUI thread can display it safely.
+    std::lock_guard<std::mutex> lock(gameEventMutex);
+    pendingGameEvents.push_back({shooter, target});
+}
+
+
+void Interface::refreshGameEvents() {
+    // Take all pending events out of the queue.
+    std::vector<std::pair<int, int>> events;
+
+    {
+        std::lock_guard<std::mutex> lock(gameEventMutex);
+        events.swap(pendingGameEvents);
+    }
+
+    // Nothing new happened since the last refresh.
+    if (events.empty()) {
+        return;
+    }
+
+    // Get current players so equipment IDs can be changed
+    // into readable codenames.
+    std::map<int, Player> rosterRed =
+        Database::getPlayers(Player::Team::RED);
+
+    std::map<int, Player> rosterGreen =
+        Database::getPlayers(Player::Team::GREEN);
+
+    // Helper for finding a player by equipment ID.
+    auto findPlayer = [&](int equipmentID) -> const Player* {
+        auto redPlayer = rosterRed.find(equipmentID);
+
+        if (redPlayer != rosterRed.end()) {
+            return &redPlayer->second;
+        }
+
+        auto greenPlayer = rosterGreen.find(equipmentID);
+
+        if (greenPlayer != rosterGreen.end()) {
+            return &greenPlayer->second;
+        }
+
+        return nullptr;
+    };
+
+    // Temporarily enable the text box so we can add text.
+    ".paAction" << configure() -state("normal");
+
+    for (const auto& event : events) {
+        int shooterID = event.first;
+        int targetID = event.second;
+
+        const Player* shooter = findPlayer(shooterID);
+
+        std::string shooterName;
+
+        if (shooter != nullptr) {
+            shooterName = shooter->codename;
+        } else {
+            shooterName = "Equipment " + std::to_string(shooterID);
+        }
+
+        std::string eventText;
+
+        // Target 43 means the Green base was hit.
+        if (targetID == 43) {
+            eventText =
+                shooterName + " hit the Green Base! (+100)";
+        }
+
+        // Target 53 means the Red base was hit.
+        else if (targetID == 53) {
+            eventText =
+                shooterName + " hit the Red Base! (+100)";
+        }
+
+        // Normal player hit or friendly fire.
+        else {
+            const Player* target = findPlayer(targetID);
+
+            std::string targetName;
+
+            if (target != nullptr) {
+                targetName = target->codename;
+            } else {
+                targetName = "Equipment " + std::to_string(targetID);
+            }
+
+            // Same team = friendly fire.
+            if (shooter != nullptr &&
+                target != nullptr &&
+                shooter->team == target->team) {
+
+                eventText =
+                    "FRIENDLY FIRE: " +
+                    shooterName +
+                    " hit " +
+                    targetName;
+            }
+
+            // Players are on opposing teams.
+            else {
+                eventText =
+                    shooterName +
+                    " hit " +
+                    targetName;
+            }
+        }
+
+        // Add this event to the bottom of the action window.
+        ".paAction" << insert("end", eventText + "\n");
+    }
+
+    // Automatically keep the newest event visible.
+    ".paAction" << see("end");
+
+    // Prevent the user from manually editing the action log.
+    ".paAction" << configure() -state("disabled");
 }
 
 void Interface::timer() {
@@ -551,6 +750,7 @@ void Interface::timer() {
 		}
 		
 		refreshScoreBoard();
+		refreshGameEvents();
 		update();
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
