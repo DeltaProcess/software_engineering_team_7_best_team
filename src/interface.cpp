@@ -107,7 +107,7 @@ void Interface::showPlayerEntry() {
 	grid(configure, ".f1.b2") -column(2) -row(5) -pady(10);
 
 	// Start game
-	button(".f1.b3") -text("Start (F5)") -command(this->startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b3") -text("Start (F5)") -command(startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
 	bind(".", "<F5>", startCheck);
 	
@@ -118,7 +118,7 @@ void Interface::showPlayerEntry() {
 	button(".f1.b5") -text("Clear Green") -command(clearGreenPlayers) -fg("white") -bg("#336b33") -activebackground("#224b22") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b5") -column(2) -row(6) -pady(10);
 	
-	button(".f1.b6") -text("Clear All (F12)") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b6") -text("Clear All (F12)") -command(clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b6") -column(1) -row(6) -pady(10);
 	
 	bind(".", "<F12>", clearAllPlayers);
@@ -525,7 +525,7 @@ void Interface::addGameEvent(int shooter, int target) {
 
 void Interface::timer() {
 	//361
-	for (int i = 31; i >= 0; i--) {
+	for (int i = 361; i >= 0; i--) {
 		int min = i/60;
 		int sec = i%60;
 		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
@@ -553,7 +553,7 @@ void Interface::timer() {
 	
 	// Return button
     button(".paReturn") -text("Return to Player Entry") -command(returnPlayerEntry) -fg("white") -bg("#bf0000");
-    grid(configure, ".paReturn") -column(0) -row(7);
+    grid(configure, ".paReturn") -column(0) -row(0);
     update();
 }
 
