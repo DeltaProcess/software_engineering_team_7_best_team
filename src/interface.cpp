@@ -20,7 +20,7 @@ using namespace cv;
 std::string Interface::tmp_img = "assets/images/tmp.png";
 std::string Interface::netaddr = "127.0.0.1";
 Audio Interface::audio;
-
+bool Interface::firstRun = true;
 
 // Events received by the UDP thread wait here until the GUI refreshes them.
 namespace {
@@ -38,11 +38,25 @@ struct Track
 Interface::Interface(char* arg) {
 	init(arg);
 	audio.init();
+	splash();
+	showPlayerEntry();
+}
 
+// Display splash screen
+void Interface::splash() {
+	importImage("assets/images/logo.jpg", 300, 300);
+	button(".b") -image(images(create, photo, "logo") -file(tmp_img));
+	pack(".b") -expand(true) -fill("both");
+	update();
+	std::this_thread::sleep_for(std::chrono::seconds(3));
+
+	destroy(".b");
+	images(deleteimg, "logo");
+}
+
+void Interface::showPlayerEntry() {
 	// Formatted window title
 	wm("title", ".", "                Photon7");
-
-	splash();
 
 	// Red and green team labels
 	label(".l1") -width(80) -text("Red Team") -fg("red") -bg("black");
@@ -86,25 +100,25 @@ Interface::Interface(char* arg) {
 	bind(".f1.e3", "<Return>", setEqID);
 
 	// Add user
-	button(".f1.b1") -text("Add to Red") -command(this->addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b1") -text("Add to Red") -command(addRedPlayer) -fg("white") -bg("#bf0000") -activebackground("#9c0000") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b1") -column(0) -row(5) -pady(10);
 
-	button(".f1.b2") -text("Add to Green") -command(this->addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b2") -text("Add to Green") -command(addGreenPlayer) -fg("white") -bg("#00bf00") -activebackground("#009c00") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b2") -column(2) -row(5) -pady(10);
 
 	// Start game
-	button(".f1.b3") -text("Start") -command(this->startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b3") -text("Start") -command(startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
 	bind(".", "<F5>", startCheck);
 	
 	// Clear player buttons
-	button(".f1.b4") -text("Clear Red") -command(this->clearRedPlayers) -fg("white") -bg("#6b3333") -activebackground("#4b2222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b4") -text("Clear Red") -command(clearRedPlayers) -fg("white") -bg("#6b3333") -activebackground("#4b2222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b4") -column(0) -row(6) -pady(10);
 	
-	button(".f1.b5") -text("Clear Green") -command(this->clearGreenPlayers) -fg("white") -bg("#336b33") -activebackground("#224b22") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b5") -text("Clear Green") -command(clearGreenPlayers) -fg("white") -bg("#336b33") -activebackground("#224b22") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b5") -column(2) -row(6) -pady(10);
 	
-	button(".f1.b6") -text("Clear All") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b6") -text("Clear All") -command(clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b6") -column(1) -row(6) -pady(10);
 	
 	bind(".", "<F12>", clearAllPlayers);
@@ -117,7 +131,7 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.e4") -column(1) -row(7) -pady(10);
 	".f1.e4" << insert("0", netaddr);
 	
-	button(".f1.b7") -text("Change Address") -command(this->updateNetAddr) -fg("white") -bg("#aa65b5") -activebackground("#623869") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b7") -text("Change Address") -command(updateNetAddr) -fg("white") -bg("#aa65b5") -activebackground("#623869") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b7") -column(2) -row(7) -pady(10);
 	
 	// Recenter window
@@ -131,18 +145,6 @@ Interface::Interface(char* arg) {
 	wm(geometry, ".", std::to_string(window_width) + "x" + std::to_string(window_height) + "+" + std::to_string(xpos) + "+" + std::to_string(ypos));
 
 	runEventLoop();
-}
-
-// Display splash screen
-void Interface::splash() {
-	importImage("assets/images/logo.jpg", 300, 300);
-	button(".b") -image(images(create, photo, "logo") -file(tmp_img));
-	pack(".b") -expand(true) -fill("both");
-	update();
-	std::this_thread::sleep_for(std::chrono::seconds(3));
-
-	destroy(".b");
-	images(deleteimg, "logo");
 }
 
 // Autoimporter for .jpg images
@@ -359,32 +361,6 @@ void Interface::clearPlayers(bool red, bool green) {
 	focus(".f1.e1");
 }
 
-// Refresh team displays
-void Interface::refreshDisplay() {
-	std::map<int,Player> rosterRed = Database::getPlayers(Player::Team::RED);
-	std::map<int,Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
-
-	".t1" << configure() -state("normal");
-	".t1" << deletetext("1.0", end);
-	".t1" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
-	for (auto player: rosterRed) {
-		int eqID = player.first;
-		Player p = player.second;
-		 ".t1"  << insert("end", std::to_string(p.id) + "\t\t      " + p.codename + "\t                  "+ std::to_string(eqID) + "\n");
-	}
-	".t1" << configure() -state("disabled");
-
-	".t2" << configure() -state("normal");
-	".t2" << deletetext("1.0", end);
-	".t2" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
-	for (auto player: rosterGreen) {
-		int eqID = player.first;
-		Player p = player.second;
-		 ".t2" << insert("end", std::to_string(p.id) + "\t\t      " + p.codename + "\t                  "+ std::to_string(eqID) + "\n");
-	}
-	".t2" << configure() -state("disabled");
-}
-
 void Interface::start() {
 	// Track list
 	static const std::vector<Track> tracklist = {
@@ -407,9 +383,11 @@ void Interface::start() {
 	// Destroy everything but root for play action screen
 	countdown(chosen_track.path, chosen_track.start_time);
 	
-	// Croadcast start
-	std::thread rx(receive);
-	rx.detach();
+	// Broadcast start
+	if(firstRun) {
+		std::thread rx(receive);
+		rx.detach();
+	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	std::string message = "202";
 	broadcast(netaddr.c_str(), message);
@@ -520,6 +498,65 @@ void Interface::showPlayActionScreen() {
     timer();
 }
 
+void Interface::returnPlayerEntry() {
+	// Remove all but root to return to player entry
+	destroy(".paRedLabel");
+	destroy(".paGreenLabel");
+	destroy(".paRed");
+	destroy(".paGreen");
+	destroy(".paRedScore");
+	destroy(".paGreenScore");
+	destroy(".paActionLabel");
+	destroy(".paAction");
+	destroy(".paTimer");
+	destroy(".paReturn");
+	// Remove players from database
+	Database::clearPlayers(true, true);
+	firstRun = false;
+	showPlayerEntry();
+}
+
+void Interface::addGameEvent(int shooter, int target) {
+    // This function is called by the UDP receive thread.
+    // Store the event so the main GUI thread can display it safely.
+    std::lock_guard<std::mutex> lock(gameEventMutex);
+    pendingGameEvents.push_back({shooter, target});
+}
+
+void Interface::timer() {
+	//361
+	for (int i = 31; i >= 0; i--) {
+		int min = i/60;
+		int sec = i%60;
+		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
+		".paTimer" << configure() -text(timer);
+		
+		int scoreRed = Database::getTeamScore(Player::Team::RED);
+		int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
+		if(scoreRed > scoreGreen) {
+			".paGreenScore" << configure() -foreground("white");
+			".paRedScore" << configure() -foreground((i%2==0)?"red":"white");
+		} else {
+			".paRedScore" << configure() -foreground("white");
+			".paGreenScore" << configure() -foreground((i%2==0)?"green":"white");
+		}
+		
+		refreshScoreBoard();
+		refreshGameEvents();
+		update();
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+	// broadcasts 221 three times
+	broadcast(netaddr.c_str(), "221");
+	broadcast(netaddr.c_str(), "221");
+	broadcast(netaddr.c_str(), "221");
+	
+	// Return button
+    button(".paReturn") -text("Return to Player Entry") -command(returnPlayerEntry) -fg("white") -bg("#bf0000");
+    grid(configure, ".paReturn") -column(0) -row(7);
+    update();
+}
+
 void Interface::refreshScoreBoard() {
 	// Get players already entered for each team
     std::map<int, Player> rosterRed = Database::getPlayers(Player::Team::RED);
@@ -571,13 +608,31 @@ void Interface::refreshScoreBoard() {
 	".paGreenScore" << configure() -text("Green Team Score: " + std::to_string(scoreGreen));
 }
 
-void Interface::addGameEvent(int shooter, int target) {
-    // This function is called by the UDP receive thread.
-    // Store the event so the main GUI thread can display it safely.
-    std::lock_guard<std::mutex> lock(gameEventMutex);
-    pendingGameEvents.push_back({shooter, target});
-}
+// Refresh team displays
+void Interface::refreshDisplay() {
+	std::map<int,Player> rosterRed = Database::getPlayers(Player::Team::RED);
+	std::map<int,Player> rosterGreen = Database::getPlayers(Player::Team::GREEN);
 
+	".t1" << configure() -state("normal");
+	".t1" << deletetext("1.0", end);
+	".t1" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
+	for (auto player: rosterRed) {
+		int eqID = player.first;
+		Player p = player.second;
+		 ".t1"  << insert("end", std::to_string(p.id) + "\t\t      " + p.codename + "\t                  "+ std::to_string(eqID) + "\n");
+	}
+	".t1" << configure() -state("disabled");
+
+	".t2" << configure() -state("normal");
+	".t2" << deletetext("1.0", end);
+	".t2" << insert("0.0", "ID\t\t      Codename\t                  Equipment\n");
+	for (auto player: rosterGreen) {
+		int eqID = player.first;
+		Player p = player.second;
+		 ".t2" << insert("end", std::to_string(p.id) + "\t\t      " + p.codename + "\t                  "+ std::to_string(eqID) + "\n");
+	}
+	".t2" << configure() -state("disabled");
+}
 
 void Interface::refreshGameEvents() {
     // Take all pending events out of the queue.
@@ -691,34 +746,6 @@ void Interface::refreshGameEvents() {
 
     // Prevent the user from manually editing the action log.
     ".paAction" << configure() -state("disabled");
-}
-
-void Interface::timer() {
-	for (int i = 361; i >= 0; i--) {
-		int min = i/60;
-		int sec = i%60;
-		std::string timer = "Time Remaining: " + std::string((min<10)?"0":"") + std::to_string(min) + ":" + std::string((sec<10)?"0":"") + std::to_string(sec);
-		".paTimer" << configure() -text(timer);
-		
-		int scoreRed = Database::getTeamScore(Player::Team::RED);
-		int scoreGreen = Database::getTeamScore(Player::Team::GREEN);
-		if(scoreRed > scoreGreen) {
-			".paGreenScore" << configure() -foreground("white");
-			".paRedScore" << configure() -foreground((i%2==0)?"red":"white");
-		} else {
-			".paRedScore" << configure() -foreground("white");
-			".paGreenScore" << configure() -foreground((i%2==0)?"green":"white");
-		}
-		
-		refreshScoreBoard();
-		refreshGameEvents();
-		update();
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
-	// broadcasts 221 three times
-	broadcast(netaddr.c_str(), "221");
-	broadcast(netaddr.c_str(), "221");
-	broadcast(netaddr.c_str(), "221");
 }
 
 bool Interface::updateNetAddr()
