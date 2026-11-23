@@ -93,7 +93,7 @@ Interface::Interface(char* arg) {
 	grid(configure, ".f1.b2") -column(2) -row(5) -pady(10);
 
 	// Start game
-	button(".f1.b3") -text("Start") -command(this->startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b3") -text("Start (F5)") -command(this->startCheck) -fg("white") -bg("black") -activebackground("gray") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b3") -column(1) -row(5) -pady(10);
 	bind(".", "<F5>", startCheck);
 	
@@ -104,7 +104,7 @@ Interface::Interface(char* arg) {
 	button(".f1.b5") -text("Clear Green") -command(this->clearGreenPlayers) -fg("white") -bg("#336b33") -activebackground("#224b22") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b5") -column(2) -row(6) -pady(10);
 	
-	button(".f1.b6") -text("Clear All") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
+	button(".f1.b6") -text("Clear All (F12)") -command(this->clearAllPlayers) -fg("white") -bg("#414141") -activebackground("#222222") -activeforeground("white") -width(10) -highlightbackground("#0000fe") -highlightthickness(2);
 	grid(configure, ".f1.b6") -column(1) -row(6) -pady(10);
 	
 	bind(".", "<F12>", clearAllPlayers);
